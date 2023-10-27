@@ -84,7 +84,8 @@ git clone https://github.com/Yufccode/Load-balanced-online-OJ-system.git
 进入仓库。
 
 ```
-cd Load-balanced-online-OJ-system
+cd Load-balanced-online-OJ-system;
+cd online_judge
 ```
 
 编译生成可执行。
