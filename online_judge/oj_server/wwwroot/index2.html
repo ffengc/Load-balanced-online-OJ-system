@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>这个我的个人OJ系统</title>
+    <!-- 网页的样式 -->
+    <style>
+        * {
+            /* 消除网页默认外边距 */
+            margin: 0px;
+            /* 消除网页的默认内边距 */
+            padding: 0px;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+        }
+
+        .container .navbar {
+            width: 100%;
+            height: 50px;
+            background-color: black;
+            /* 给父级标签设置overflow，取消后续float带来的影响 */
+            overflow: hidden;
+        }
+
+        .container .navbar a {
+            display: inline-block;
+            /* 设置a标签的宽度 */
+            width: 80px;
+            /* 设置字体 */
+            color: white;
+            font-size: larger;
+            /* 上下居中 */
+            line-height: 50px;
+            /* 文字和导航栏同样高度 */
+            text-decoration: none;
+            /* 设置文字居中 */
+            text-align: center;
+        }
+
+        /* 设置鼠标事件 */
+        .container .navbar a:hover {
+            background-color: green;
+        }
+
+        .container .navbar .login {
+            float: right;
+        }
+
+        .container .content {
+            width: 800px;
+            /* background-color: #ccc; */
+            /* 整体居中 */
+            margin: 0px auto;
+            /* 设置文字居中 */
+            text-align: center;
+            /* 设置上外边距 */
+            margin-top: 200px;
+        }
+
+        .container .content .font_ {
+            /* 设置标签为块级元素，独占一行，可以设置高度宽度等属性 */
+            display: block;
+            /* 设置上外边距 */
+            margin-top: 20px;
+            /* 去掉下划线 */
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 导航栏 功能不实现-->
+        <div class="navbar">
+            <a href="#">首页</a>
+            <a href="/all_questions">题库</a>
+            <a href="#">竞赛</a>
+            <a href="#">讨论</a>
+            <a href="#">求职</a>
+            <a class="login" href="#">登录</a>
+        </div>
+        <!-- 网页的内容 -->
+        <div class="content">
+            <h1 class="font_">Welcome to OnlineJudge System</h1>
+            <p class="font_">这个是我独立开发的在线OJ平台</p>
+            <h2 class="font_">
+                <a href="/all_questions">点击我开始编程啦～</a>
+            </h2>
+        </div>
+    </div>
+
+
+</body>
+
+</html>
