@@ -106,6 +106,7 @@ make
 ```
 
 ```bash
+export LD\_LIBRARY\_PATH=$LD\_LIBRARY\_PATH:/usr/local/lib # 设置环境变量
 ./oj_server # 第四个命令行执行这个命令
 ```
 
