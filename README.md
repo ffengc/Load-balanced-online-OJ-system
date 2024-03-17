@@ -1,5 +1,5 @@
 # Load-balanced-online-OJ-system
-![](./figs/0.png)
+![](./figs/tmp.png)
 
 ## 负载均衡OJ系统
 
