@@ -1,41 +1,46 @@
 # Load-balanced-online-OJ-system
 ![](./figs/tmp.png)
 
-## 负载均衡OJ系统
+***
 
-这是一个负载均衡的OJ系统项目
+- **[简体中文](./README-CN.md)**
+- **[English](./README.md)**
 
-代码的实现细节可见
+***
+
+## Load-balanced-online-OJ-system
+
+The detailed code details of the project implementation are shown in the following files.
 
 - **[./Work.md](./Work.md)**
 
-## 1. 项目简介
+## 1. Project Description
 
-实现类似leetcode的在线编程系统。
+Implement an online programming system similar to leetcode.
 
-后台可以部署多台编译服务主机（cr主机），然后oj_server服务将通过算法将大量的提交请求负载均衡地部署到每台cr主机上。如果后台有cr主机挂掉了，oj_server也能正确识别。
+Multiple compilation service hosts (cr hosts) can be deployed in the background, and then the oj_server service will load-balancedly deploy a large number of submission requests to each cr host through algorithms. If the cr host in the background hangs up, oj_server can also correctly identify it.
 
-架构如下。
+The architecture is as follows.
 
 
 ![](./README.figs/10.png)
 
-## 2. 所用技术和开发环境
+## 2. Technologies and development environments used
 
-**所用技术**
+**Technology used**
 
-> C++STL、Boost准标准库、cpp-httplib第三方开源网络库、ctemplate第三方开源前端网页渲染库、jsoncpp第三方序列化反序列化库、负载均衡设计、分布式系统、多进程多线程控制、Mysql C Connect、Ace前端在前编辑器、html/css/js/jquery/ajax
+> C++STL, Boost quasi-standard library, cpp-httplib third-party open source network library, ctemplate third-party open source front-end web page rendering library, jsoncpp third-party serialization and deserialization library, load balancing design, distributed system, multi-process and multi-threading Control, Mysql C Connect, Ace front-end editor, html/css/js/jquery/ajax
 
-**开发环境**
+**Development Environment**
 
-- centos服务器
+- centos server
 - vscode
 
-## 3. 项目运行展示
+## 3. Project operation display
 
-### 3.1 页面展示
+### 3.1 Page display
 
-主页。
+Homepage.
 
 ![](./README.figs/1.png)
 
@@ -43,7 +48,7 @@
 
 ![](./README.figs/2.png)
 
-答题界面。
+Answer interface.
 
 ![](./README.figs/3.png)
 
@@ -55,72 +60,72 @@
 
 ![](./README.figs/5.png)
 
-### 3.2 后端展示
+### 3.2 Backend display
 
-编译服务后端。
+Compile service backend interface
 
 ![](./README.figs/6.png)
 
-oj服务后端。
+oj service backend.
 
 ![](./README.figs/7.png)
 
-瞬间多次提交，查看负载均衡情况。
+Submit multiple times instantly to check the load balancing situation.
 
 ![](./README.figs/8.png)
 
 ![](./README.figs/9.png)
 
-可以看到oj_server是可以很好的实现负载均衡的，每一台后台主机都能得到请求。
+It can be seen that oj_server can achieve load balancing very well, and every background host can get requests.
 
-## 4. 下载和运行方法
+## 4. How to download and run
 
-### 4.1 运行
+### 4.1 run
 
-克隆仓库。
+clone the repo。
 
 ```bash
 git clone https://github.com/Yufccode/Load-balanced-online-OJ-system.git
 ```
 
-进入仓库。
+enter the repo。
 
 ```
 cd Load-balanced-online-OJ-system;
 cd online_judge
 ```
 
-编译生成可执行。
+Compile to generate executable。
 
 ```bash
 make
 ```
 
-此时在oj_server目录下和compile_server目录下已经分别有一个可执行了。
+At this time, there is already an executable in the oj_server directory and compile_server directory respectively.。
 
-然后分别在三个命令行下启动compile_server，然后在第四个命令行下启动oj_server
+Then start compile_server under three command lines, and then start oj_server under the fourth command line.
 
 ```bash
-# 三个命令行分别执行这三个
+# Three command lines execute these three respectively
 ./compile_server 8081
 ./compile_server 8082
 ./compile_server 8083
 ```
 
 ```bash
-export LD\_LIBRARY\_PATH=$LD\_LIBRARY\_PATH:/usr/local/lib # 设置环境变量
-./oj_server # 第四个命令行执行这个命令
+export LD\_LIBRARY\_PATH=$LD\_LIBRARY\_PATH:/usr/local/lib # set the env
+./oj_server # The fourth command line executes this command
 ```
 
-在浏览器浏览访问8080端口即可。
+Just browse to port 8080 in your browser.
 
 ![](./README.figs/11.png)
 
-如果是云服务器记得放开防火墙，否则也无法访问。
+If it is a cloud server, remember to open the firewall, otherwise it will not be accessible.
 
-### 4.2 增加/调整cr服务的主机或把cr服务部署到远端
+### 4.2 Add/adjust the host of the cr service or deploy the cr service to the remote end
 
-现在默认是三台cr服务的主机。可以增加，修改配置文件就行了。
+The default is now three cr service hosts. You can add it and just modify the configuration file.
 
 ```
 ./oj_server/conf/service_machine.conf
@@ -132,27 +137,27 @@ export LD\_LIBRARY\_PATH=$LD\_LIBRARY\_PATH:/usr/local/lib # 设置环境变量
 127.0.0.1:8083
 ```
 
-改里面的配置就行了，很简单，如果要部署到远端就改成你远端的ip就行了，然后如果要增加主机的话直接在后面接着加上去即可。
+Just change the configuration inside. It's very simple. If you want to deploy to the remote end, just change it to your remote IP. Then if you want to add a host, just add it directly later.
 
-### 4.3 发布项目
+### 4.3 publish project
 
-调用最上级目录的`makefile`文件即可。
+Just call the `makefile` file in the top directory.
 
 ```bash
 make
 ```
 
-make之后就会有一个`make_output`目录，里面就是要发布的内容。
+After make, there will be a `make_output` directory, which contains the content to be published.
 
-## 5. 增加题目的方法
+## 5. How to add questions
 
-所以题目的信息都存储在这目录下。
+So the question information is stored in this directory.
 
 ```
 ./oj_server/questions
 ```
 
-目录结构如下所示。
+The directory structure is shown below.
 
 ```
 .
@@ -177,7 +182,7 @@ make之后就会有一个`make_output`目录，里面就是要发布的内容。
 4 directories, 13 files
 ```
 
-question.list格式。
+question.list format.
 
 ```
 1 字符串长度 简单 1 30000
@@ -186,14 +191,14 @@ question.list格式。
 4 N皇后 困难 1 30000
 ```
 
-每一列分别是，题目列表，题目名称，难度，cpu运行时间限制，内存使用限制。
+Each column is the question list, question name, difficulty, CPU running time limit, and memory usage limit.
 
-每一个以数字为名字的文件夹代表每一个题目的详细信息。
+Each folder named with a number represents detailed information for each topic.
 
-`desc.txt`是题目描述和一些详细信息。
+`desc.txt` is the topic description and some detailed information.
 
-`header.cpp`是展示给用户的代码片段。
+`header.cpp` is the code snippet displayed to the user.
 
-`tail.cpp`是后端用于测试的代码片段。
+`tail.cpp` is the code snippet used by the backend for testing.
 
-增加题目按照上述的格式进行添加即可。
+To add questions, just follow the above format.
