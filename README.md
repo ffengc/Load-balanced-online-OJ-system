@@ -1,5 +1,4 @@
 # Load-balanced-online-OJ-system
-![](./figs/tmp.png)
 
 ***
 
