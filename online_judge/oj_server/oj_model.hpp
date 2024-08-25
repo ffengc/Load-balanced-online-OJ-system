@@ -1,4 +1,8 @@
-
+/*
+ * Write by Yufc
+ * See https://github.com/ffengc/Load-balanced-online-OJ-system
+ * please cite my project link: https://github.com/ffengc/Load-balanced-online-OJ-system when you use this code
+ */
 
 #ifndef __YUFC_OJ_MODEL_HPP__
 #define __YUFC_OJ_MODEL_HPP__
@@ -13,8 +17,8 @@
 #include "../comm/log.hpp"
 #include "../comm/util.hpp"
 
-// 根据 question.list 文件，加载所有的题目信息到内存中
-// model: 主要用来和数据进行交互，对外提供访问数据的接口
+// According to the question.list file, load all the question information into memory
+// Model: Mainly used to interact with data and provide an interface for accessing data
 
 namespace ns_model
 {
@@ -24,14 +28,14 @@ namespace ns_model
     struct Question
     {
     public:
-        std::string __number; // 题目编号（唯一的）
-        std::string __title;  // 题目的标题
-        std::string __star;   // 题目的难度 // 简单/中等/困难
-        int __cpu_limit;      // 题目时间要求
-        int __mem_limit;      // 题目的空间要求
-        std::string __desc;   // 题目的描述
-        std::string __header; // 预设的代码
-        std::string __tail;   // 题目的测试用例，需要和header拼接，形成完整的代码
+        std::string __number; // Question number (unique)
+        std::string __title;  // Question title
+        std::string __star;   // Difficulty level of the question // Easy/Medium/Hard
+        int __cpu_limit;      // CPU time limit for the question
+        int __mem_limit;      // Memory space requirement for the question
+        std::string __desc;   // Description of the question
+        std::string __header; // Preset code for the question
+        std::string __tail;   // Test cases for the question, need to be concatenated with header to form complete code
     };
 
     const std::string question_list_root = "./questions/question.list";
@@ -52,27 +56,27 @@ namespace ns_model
         bool LoadQuestionList(const std::string &question_list)
         {
             /*
-                加载配置文件: questions/question.list + 题目编号文件
+                Load configuration file: questions/question.list + question number file
             */
 
             std::ifstream in(question_list);
             if (!in.is_open())
             {
-                LOG(FATAL) << "加载题库失败，请检查是否存在题库文件"
+                LOG(FATAL) << "Failed to load question bank, please check if the question bank file exists"
                            << "\n";
                 return false;
             }
-            // 按行读取
+            // Read line by line
             std::string line;
             while (std::getline(in, line))
             {
-                // 以空格为分割符
-                // 切分字符串
+                // Use space as the delimiter
+                // Split string
                 std::vector<std::string> tokens;
                 StringUtil::SplitString(line, &tokens, " ");
-                if (tokens.size() != 5) // 说明切分有问题
+                if (tokens.size() != 5) // Indicates a split error
                 {
-                    LOG(WARNING) << "加载部分题目失败，请检查文件格式"
+                    LOG(WARNING) << "Failed to load some questions, please check file format"
                                  << "\n";
                     continue;
                 }
@@ -91,9 +95,9 @@ namespace ns_model
                 FileUtil::ReadFile(question_number_path + "header.cpp", &(q.__header), true);
                 FileUtil::ReadFile(question_number_path + "tail.cpp", &(q.__tail), true);
 
-                __questions.insert({q.__number, q}); // 插入到哈希表中
+                __questions.insert({q.__number, q}); // Insert into hash table
             }
-            LOG(INFO) << "加载题库 ... 成功！"
+            LOG(INFO) << "Question bank loaded ... Successfully!"
                       << "\n";
             in.close();
             return true;
@@ -102,13 +106,13 @@ namespace ns_model
         {
             if (__questions.size() == 0)
             {
-                LOG(ERROR) << "用户获取题库失败"
+                LOG(ERROR) << "Failed to retrieve question bank"
                            << "\n";
                 return false;
             }
             for (const auto &q : __questions)
             {
-                out->push_back(q.second); // 把哈希的丢到vector里面去
+                out->push_back(q.second); // Put hash into vector
             }
             return true;
         }
@@ -117,7 +121,7 @@ namespace ns_model
             const auto &iter = __questions.find(number);
             if (iter == __questions.end())
             {
-                LOG(ERROR) << "用户获取题目失败，题目编号: " << number << "\n";
+                LOG(ERROR) << "Failed to retrieve question, question number: " << number << "\n";
                 return false;
             }
             (*q) = iter->second;

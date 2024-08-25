@@ -1,4 +1,8 @@
-
+/*
+ * Write by Yufc
+ * See https://github.com/ffengc/Load-balanced-online-OJ-system
+ * please cite my project link: https://github.com/ffengc/Load-balanced-online-OJ-system when you use this code
+ */
 
 #include "compile_run.hpp"
 #include "../comm/httplib.h"
@@ -22,11 +26,11 @@ int main(int argc, char *argv[])
     Server svr;
 #if false
     svr.Get("/hello", [](const Request &req, Response &resp)
-            { resp.set_content("hello httplib, 你好", "text/plain;charset=utf-8;"); });
+            { resp.set_content("hello httplib, hello", "text/plain;charset=utf-8;"); });
 #endif
     svr.Post("/compile_and_run", [](const Request &req, Response &resp)
              {
-        // 用户请求的正文，就是我们想要的json string
+        // The body of the user's request is the json string we want
         std::string in_json = req.body;
         std::string out_json;
         if (!in_json.empty())
@@ -35,7 +39,7 @@ int main(int argc, char *argv[])
             resp.set_content(out_json, "application/json;charset=utf-8");
         } });
 
-    svr.listen("0.0.0.0", atoi(argv[1])); // 启动http服务
+    svr.listen("0.0.0.0", atoi(argv[1])); // Start the http service
 
     return 0;
 }

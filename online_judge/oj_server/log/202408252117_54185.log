@@ -1,0 +1,14 @@
+[INFO][././oj_model.hpp][94] Question bank loaded ... Successfully!
+[INFO][./oj_control.hpp][93] Load: ./conf/service_machine.conf success
+[INFO][./oj_control.hpp][271] Select host successfully, host id: 0 detail: 127.0.0.1:8081 The current host load is: 1
+[INFO][./oj_control.hpp][285] The host id of the current request: 0detail: 127.0.0.1:8081 May be offline
+[INFO][./oj_control.hpp][271] Select host successfully, host id: 1 detail: 127.0.0.1:8082 The current host load is: 1
+[INFO][./oj_control.hpp][271] Select host successfully, host id: 2 detail: 127.0.0.1:8083 The current host load is: 1
+[INFO][./oj_control.hpp][285] The host id of the current request: 2detail: 127.0.0.1:8083 May be offline
+[INFO][./oj_control.hpp][271] Select host successfully, host id: 1 detail: 127.0.0.1:8082 The current host load is: 2
+[INFO][./oj_control.hpp][279] Request cr service successfully ... 
+[INFO][./oj_control.hpp][279] Request cr service successfully ... 
+[INFO][./oj_control.hpp][271] Select host successfully, host id: 1 detail: 127.0.0.1:8082 The current host load is: 1
+[INFO][./oj_control.hpp][279] Request cr service successfully ... 
+[INFO][./oj_control.hpp][271] Select host successfully, host id: 1 detail: 127.0.0.1:8082 The current host load is: 1
+[INFO][./oj_control.hpp][279] Request cr service successfully ... 

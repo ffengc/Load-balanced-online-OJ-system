@@ -1,5 +1,10 @@
+/*
+ * Write by Yufc
+ * See https://github.com/ffengc/Load-balanced-online-OJ-system
+ * please cite my project link: https://github.com/ffengc/Load-balanced-online-OJ-system when you use this code
+ */
 
-/* export LD\_LIBRARY\_PATH=$LD\_LIBRARY\_PATH:/usr/local/lib */
+/* export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib */
 
 #include <iostream>
 #include <signal.h>
@@ -19,34 +24,34 @@ void Recovery(int signo)
 int main()
 {
     signal(SIGQUIT, Recovery);
-    // 用户请求的路由功能
+    // Route functions for user requests
     Server svr;
     Control ctrl;
     g_ctrl_ptr = &ctrl;
-    // 获取所有题目的列表
+    // Retrieve the list of all questions
     svr.Get("/all_questions", [&ctrl](const Request &req, Response &resp)
             {
-        // 这里我想返回一张包含所以题目列表信息的html网页
+        // Here I want to return a webpage containing the list of all questions
         std::string html;
         ctrl.AllQuestions(&html);
 
         resp.set_content(html, "text/html; charset=utf-8"); });
-    // 用户要根据题目编号获取题目的内容
-    // /question/100  ->  正则匹配
+    // Users want to get the content of a question based on its number
+    // /question/100 -> Regular expression matching
     svr.Get(R"(/question/(\d+))", [&ctrl](const Request &req, Response &resp)
             {
         std::string number = req.matches[1];
         std::string html;
         ctrl.Question(number, &html);
         resp.set_content(html, "text/html; charset=utf-8"); });
-    // 用户提交
+    // User submissions
     svr.Post(R"(/judge/(\d+))", [&ctrl](const Request &req, Response &resp)
              {
         std::string number = req.matches[1];
         std::string res_json;
         ctrl.Judge(number, req.body, &res_json);
         resp.set_content(res_json, "application/json; charset=utf-8"); });
-    // 设置一下首页
+    // Set the homepage
     svr.set_base_dir("./wwwroot");
 
     svr.listen("0.0.0.0", 8080);
@@ -56,25 +61,25 @@ int main()
 #if false
 int main()
 {
-    // 用户请求的路由功能
+    // Route functions for user requests
     Server svr;
-    // 获取所有题目的列表
+    // Retrieve the list of all questions
     svr.Get("/all_questions", [](const Request &req, Response &resp) {
-        resp.set_content("这是所有题目的列表", "text/plain; charset=utf-8");
+        resp.set_content("This is the list of all questions", "text/plain; charset=utf-8");
     });
-    // 用户要根据题目编号获取题目的内容
-    // /question/100  ->  正则匹配
+    // Users want to get the content of a question based on its number
+    // /question/100 -> Regular expression matching
     svr.Get(R"(/question/(\d+))", [](const Request &req, Response &resp){
-        std::string number = req.matches[1]; // 这里可以得到正则表达式获取到的东西
-        // 感兴趣可以研究一下
-        resp.set_content("这是指定的一道题: " + number, "text/plain; charset=utf-8");
+        std::string number = req.matches[1]; // Here you can get what the regular expression captured
+        // Interested can study further
+        resp.set_content("This is a specific question: " + number, "text/plain; charset=utf-8");
     });
-    // 用户提交
+    // User submissions
     svr.Get(R"(/judge/(\d+))", [](const Request &req, Response &resp){
         std::string number = req.matches[1];
-        resp.set_content("这是指定题目的判题: " + number, "text/plain; charset=utf-8");
+        resp.set_content("This is the judging for the specific question: " + number, "text/plain; charset=utf-8");
     });
-    // 设置一下首页
+    // Set the homepage
     svr.set_base_dir("./wwwroot");
 
     svr.listen("0.0.0.0", 8080);

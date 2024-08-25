@@ -1,4 +1,8 @@
-
+/*
+ * Write by Yufc
+ * See https://github.com/ffengc/Load-balanced-online-OJ-system
+ * please cite my project link: https://github.com/ffengc/Load-balanced-online-OJ-system when you use this code
+ */
 
 #ifndef __YUFC_COMPILE_RUN_HPP__
 #define __YUFC_COMPILE_RUN_HPP__
@@ -22,41 +26,41 @@ namespace ns_compile_run
     public:
         static std::string CodeToDesc(int code, const std::string &file_name)
         {
-            // 状态码 -> 对应的描述
+            // Status code -> corresponding description
             std::string desc;
             switch (code)
             {
             case 0:
-                desc = "编译运行成功";
+                desc = "Compilation and execution successful";
                 break;
             case -1:
-                desc = "用户提交的代码是空";
+                desc = "The submitted code is empty";
                 break;
             case -2:
-                desc = "未知错误";
+                desc = "Unknown error";
                 break;
             case -3:
-                // desc = "编译时发生了错误";
+                // desc = "An error occurred during compilation";
                 FileUtil::ReadFile(PathUtil::CompilerError(file_name), &desc, true);
                 break;
             case SIGABRT:
-                desc = "内存超过范围";
+                desc = "Memory out of bounds";
                 break;
             case SIGXCPU:
-                desc = "cpu使用超时";
+                desc = "CPU usage timeout";
                 break;
             case SIGFPE:
-                desc = "浮点数溢出";
+                desc = "Floating-point overflow";
                 break;
             default:
-                desc = "未知错误(code: " + std::to_string(code) + ")";
+                desc = "Unknown error (code: " + std::to_string(code) + ")";
                 break;
             }
             return desc;
         }
         static void RemoveTempFile(const std::string &file_name)
         {
-            // 清理文件的个数是不确定，但是有哪些我们是知道的？
+            // The number of files to clean is uncertain, but we know which ones are there?
             std::string src_file_name = PathUtil::Src(file_name);
             if (FileUtil::IsFileExists(src_file_name))
                 unlink(src_file_name.c_str());
@@ -83,16 +87,16 @@ namespace ns_compile_run
 
     public:
         /*
-            输入参数:
-                input: 用户给自己提交的代码对应的输入
-                code: 用户提交的代码对应的输入，不做处理
-                cpu_limit: 时间要求
-                mem_limit: 空间要求
-            输出参数:
-                status: 状态码
-                reason: 请求结果
-                stdout: 我的程序运行完的结果
-                stderr: 运行完的错误结果
+            Input parameters:
+                input: The input corresponding to the code submitted by the user
+                code: The input corresponding to the code submitted by the user, not processed
+                cpu_limit: Time requirement
+                mem_limit: Space requirement
+            Output parameters:
+                status: Status code
+                reason: Request result
+                stdout: The result after my program has run
+                stderr: Error result after running
         */
         /*
             in_json:
@@ -104,52 +108,52 @@ namespace ns_compile_run
         {
             Json::Value in_value;
             Json::Reader reader;
-            reader.parse(in_json, in_value); // 最后再处理差错问题
-            // 代码和输入
+            reader.parse(in_json, in_value); // Handle error checking last
+            // Code and input
             std::string code = in_value["code"].asString();
-            std::string input = in_value["input"].asString(); // 不做处理
-            // 时间限制和空间限制
+            std::string input = in_value["input"].asString(); // Not processed
+            // Time limit and space limit
             int cpu_limit = in_value["cpu_limit"].asInt();
             int mem_limit = in_value["mem_limit"].asInt();
 
-            // 因为goto跳转的区间不能定义变量
-            // 返回给上层的状态码
+            // Variables cannot be defined within the scope of a goto jump
+            // Status code to return to the upper layer
             int status_code = 0;
-            // Run返回的状态码
+            // Status code returned by Runner
             int runner_rt_code = 0;
-            // 唯一的文件名
+            // Unique file name
             std::string file_name;
 
-            // 构建一个最终给用户返回的json
+            // Build a final JSON to return to the user
             Json::Value out_value;
 
             if (code.size() == 0)
             {
-                status_code = -1; // 文件为空
+                status_code = -1; // The file is empty
                 goto END;
             }
-            // 形成一个唯一文件名，然后把code写到临时文件里面去
-            // 这里到时候采用毫秒级时间戳+原子性递增唯一值：来保证唯一性
+            // Generate a unique file name and write the code to a temporary file
+            // Use millisecond timestamp + atomic increment for uniqueness
             file_name = FileUtil::UniqFileName();
-            if (!FileUtil::WriteFile(PathUtil::Src(file_name), code)) // 形成临时src源文件
+            if (!FileUtil::WriteFile(PathUtil::Src(file_name), code)) // Generate temporary src source file
             {
-                status_code = -2; // 未知错误
+                status_code = -2; // Unknown error
                 goto END;
             }
             if (!Compiler::Compile(file_name))
             {
-                status_code = -3; // 编译错误
+                status_code = -3; // Compilation error
                 goto END;
             }
             runner_rt_code = Runner::Run(file_name, cpu_limit, mem_limit);
             if (runner_rt_code < 0)
             {
-                status_code = -2; // 未知错误
+                status_code = -2; // Unknown error
                 goto END;
             }
             else if (runner_rt_code > 0)
             {
-                status_code = runner_rt_code; // 程序运行崩溃
+                status_code = runner_rt_code; // Program crashed during execution
                 goto END;
             }
             else
@@ -161,10 +165,10 @@ namespace ns_compile_run
             out_value["reason"] = CodeToDesc(status_code, file_name);
             if (status_code == 0)
             {
-                // 整个过程全部成功
+                // The entire process was successful
                 std::string _stdout_content;
                 FileUtil::ReadFile(PathUtil::Stdout(file_name), &_stdout_content, true);
-                // stdout这里是要true的，因为不然我们呈现给用户的stdout就是堆在一行了
+                // stdout needs true here, otherwise the stdout presented to the user would be all on one line
                 out_value["stdout"] = _stdout_content;
 
                 std::string _stderr_content;
@@ -174,7 +178,7 @@ namespace ns_compile_run
             Json::StyledWriter writer;
             *out_json = writer.write(out_value);
 
-            RemoveTempFile(file_name); // 删除所有的临时文件
+            RemoveTempFile(file_name); // Remove all temporary files
         }
     };
 } // namespace ns_compile_run

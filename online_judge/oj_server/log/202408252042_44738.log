@@ -1,0 +1,4 @@
+[INFO][././oj_model.hpp][96] 加载题库 ... 成功！
+[INFO][./oj_control.hpp][93] Load: ./conf/service_machine.conf success
+[INFO][./oj_control.hpp][271] Select host successfully, host id: 0detail: 127.0.0.1:8081 The current host load is: 1
+[INFO][./oj_control.hpp][279] Request cr service successfully ... 

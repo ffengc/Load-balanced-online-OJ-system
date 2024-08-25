@@ -1,4 +1,8 @@
-
+/*
+ * Write by Yufc
+ * See https://github.com/ffengc/Load-balanced-online-OJ-system
+ * please cite my project link: https://github.com/ffengc/Load-balanced-online-OJ-system when you use this code
+ */
 
 #ifndef __YUFC_UTIL_HPP__
 #define __YUFC_UTIL_HPP__
@@ -32,7 +36,7 @@ namespace ns_util
         }
     };
 
-    const std::string temp_path_root = "./temp/"; // 全剧路径
+    const std::string temp_path_root = "./temp/"; // Global path
     class PathUtil
     {
     public:
@@ -45,26 +49,26 @@ namespace ns_util
         }
 
     public:
-        // 构建源文件路径+后缀的完整文件名
+        // Build full filename with source file path + suffix
         static std::string Src(const std::string &file_name)
         {
             /*
-                我们认为传进来的这个file_name是不带任何后缀的。
+                We assume that the incoming file_name has no suffix.
             */
             return AddSuffix(file_name, ".cpp");
         }
-        // 构建可执行程序路径+后缀的完整文件名
+        // Build full filename with executable file path + suffix
         static std::string Exe(const std::string &file_name)
         {
             return AddSuffix(file_name, ".exe");
         }
-        // 构建标准错误路径+后缀的完整文件名
+        // Build full filename with compiler error path + suffix
         static std::string CompilerError(const std::string &file_name)
         {
             return AddSuffix(file_name, ".compile_error");
         }
-        // 上面三个是编译时所需要的文件
-        // 下面三个是运行时所需要的文件
+        // The above three are files needed for compilation
+        // The following three are files needed for runtime
         static std::string Stdin(const std::string &file_name)
         {
             return AddSuffix(file_name, ".stdin");
@@ -86,18 +90,18 @@ namespace ns_util
             struct stat st;
             if (stat(path_name.c_str(), &st) == 0)
             {
-                // 获取文件属性成功了
+                // File attributes retrieved successfully
                 return true;
             }
             return false;
         }
         static std::string UniqFileName()
         {
-            // 定义一个C++11库 #include <atomic> 里面提供的一个原子性的计数器
-            static std::atomic_uint id(0); // 这里要static，避免每次调用它都重新定义这个id
+            // Define an atomic counter provided by the C++11 <atomic> library
+            static std::atomic_uint id(0); // This should be static, to avoid redefining this id every time it's called
             id++;
-            // 毫秒级时间戳+原子性递增唯一值：来保证唯一性
-            std::string ms = TimeUtil::GetTimeMs(); // 得到毫秒级时间戳
+            // Millisecond timestamp + atomic increment unique value: to ensure uniqueness
+            std::string ms = TimeUtil::GetTimeMs(); // Get millisecond timestamp
             std::string uniq_id = std::to_string(id);
             return ms + "." + uniq_id;
         }
@@ -115,7 +119,7 @@ namespace ns_util
         static bool ReadFile(const std::string &target, std::string *content, bool keep = false)
         {
             /*
-                keep == false 表示不保留每一行的 "\n"
+                keep == false means not preserving each line's "\n"
             */
             (*content).clear();
             std::ifstream in(target);
@@ -124,8 +128,8 @@ namespace ns_util
                 return false;
             }
             std::string line;
-            // getline不保存行分隔符 -- 这里有坑
-            // getline 有些时候是需要保留\n的
+            // getline does not save the line separator -- beware here
+            // Sometimes getline needs to preserve \n
             while (std::getline(in, line))
             {
                 (*content) += line;
@@ -141,11 +145,11 @@ namespace ns_util
         static void SplitString(const std::string &str, std::vector<std::string> *target, const std::string &sep)
         {
             /*
-                str: 要切分的字符串
-                target: 输出结果
-                sep: 指定的分割符
+                str: The string to split
+                target: Output result
+                sep: Specified delimiter
             */
-            // boost 库
+            // boost library
             boost::split((*target), str, boost::is_any_of(sep), boost::algorithm::token_compress_on);
         }
     };
