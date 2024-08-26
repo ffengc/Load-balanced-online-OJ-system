@@ -1,4 +1,8 @@
-
+/*
+ * Write by Yufc
+ * See https://github.com/ffengc/Load-balanced-online-OJ-system
+ * please cite my project link: https://github.com/ffengc/Load-balanced-online-OJ-system when you use this code
+ */
 
 #ifndef __YUFC_COMPILER_HPP__
 #define __YUFC_COMPILER_HPP__
@@ -11,11 +15,11 @@
 #include "../comm/util.hpp"
 #include "../comm/log.hpp"
 
-// 只负责代码的编译
+// Responsible only for code compilation
 
 namespace ns_compiler
 {
-    // 引入路径拼接功能
+    // Introduce path concatenation functionality
     using namespace ns_util;
     using namespace ns_log;
     class Compiler
@@ -27,12 +31,12 @@ namespace ns_compiler
         {
             /*
                 return value:
-                true: 编译成功
-                false: 编译失败
+                true: Compilation successful
+                false: Compilation failed
             */
             /*
-                我们认为，传进来的file_name是没有后缀的
-                所以: file_name: 1234
+                We assume that the incoming file_name has no suffix.
+                So: file_name: 1234
                 1234 -> ./temp/1234.cpp
                 1234 -> ./temp/1234.exe
                 1234 -> ./temp/1234.stderr
@@ -42,42 +46,42 @@ namespace ns_compiler
             {
                 LOG(ERROR) << "Internal error, creating child process failed"
                            << "\n";
-                return false; // 创建子进程失败 -> 编译失败
+                return false; // Failed to create child process -> Compilation failed
             }
             else if (child_pro_pid == 0)
             {
-                // 重定向错误信息
+                // Redirect error information
                 umask(0);
                 int fd_stderr = open(PathUtil::CompilerError(file_name).c_str(), O_CREAT | O_WRONLY, 0777);
                 if (fd_stderr < 0)
                 {
-                    LOG(WARNING) << "create .stderr file error"
+                    LOG(WARNING) << "Failed to create .stderr file"
                                  << "\n";
                     exit(1);
                 }
-                // 重定向标准错误到 fd_stderr
+                // Redirect standard error to fd_stderr
                 dup2(fd_stderr, 2);
 
-                // 子进程: 调用编译器，完成对代码的编译工作
+                // Child process: Call the compiler to complete the compilation of the code
                 // g++ -o target src -std=c++11
                 execlp("g++", "g++", "-o", PathUtil::Exe(file_name).c_str(), \
-                       PathUtil::Src(file_name).c_str(), "-std=c++11", "-D", "COMPILER_ONLINE", nullptr); // 不要忘记这个nullptr
-                LOG(ERROR) << "运行g++的时候出现编译错误, 可能是参数问题"
+                       PathUtil::Src(file_name).c_str(), "-std=c++11", "-D", "COMPILER_ONLINE", nullptr); // Don't forget this nullptr
+                LOG(ERROR) << "Compilation error occurred when running g++, possibly due to parameter issues"
                            << "\n";
                 exit(2);
             }
             else
             {
                 waitpid(child_pro_pid, nullptr, 0);
-                // 编译是否成功？
+                // Was compilation successful?
                 if (FileUtil::IsFileExists(PathUtil::Exe(file_name)))
                 {
-                    LOG(INFO) << PathUtil::Src(file_name) << " 编译成功"
+                    LOG(INFO) << PathUtil::Src(file_name) << " Compiled successfully"
                               << "\n";
                     return true;
                 }
             }
-            LOG(ERROR) << "编译错误, 没有生成exe文件"
+            LOG(ERROR) << "Compilation error, no .exe file generated"
                        << "\n";
             return false;
         }

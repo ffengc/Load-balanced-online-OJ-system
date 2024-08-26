@@ -1,3 +1,8 @@
+/*
+ * Write by Yufc
+ * See https://github.com/ffengc/Load-balanced-online-OJ-system
+ * please cite my project link: https://github.com/ffengc/Load-balanced-online-OJ-system when you use this code
+ */
 
 #ifndef __YUFC_OJ_VIEW_HPP__
 #define __YUFC_OJ_VIEW_HPP__
@@ -16,14 +21,14 @@ namespace ns_view
         struct Question
         {
         public:
-            std::string __number; // 题目编号（唯一的）
-            std::string __title;  // 题目的标题
-            std::string __star;   // 题目的难度 // 简单/中等/困难
-            int __cpu_limit;      // 题目时间要求
-            int __mem_limit;      // 题目的空间要求
-            std::string __desc;   // 题目的描述
-            std::string __header; // 预设的代码
-            std::string __tail;   // 题目的测试用例，需要和header拼接，形成完整的代码
+            std::string __number; // Question number (unique)
+            std::string __title; // Question title
+            std::string __star; // Question difficulty // Easy/Medium/Difficult
+            int __cpu_limit; // Question time requirement
+            int __mem_limit; // Question space requirement
+            std::string __desc; // Question description
+            std::string __header; // Preset code
+            std::string __tail; // Question test case, needs to be spliced ​​with header to form a complete code
         };
     */
     const std::string template_path = "./template_html/";
@@ -36,9 +41,9 @@ namespace ns_view
     public:
         void AllExpandHtml(const std::vector<struct Question> questions, std::string *html)
         {
-            // 1. 形成路径
+            // 1. Forming a path
             std::string src_html = template_path + "all_questions.html";
-            // 2. 形成数据字典
+            // 2. Forming a data dictionary
             ctemplate::TemplateDictionary root("all_questions");
             for (const auto &q : questions)
             {
@@ -47,10 +52,10 @@ namespace ns_view
                 sub->SetValue("title", q.__title);
                 sub->SetValue("star", q.__star);
             }
-            // 3. 获取被渲染的html
+            // 3. Get the rendered html
             ctemplate::Template *tpl = ctemplate::Template::GetTemplate(src_html, ctemplate::DO_NOT_STRIP);
 
-            // 4. 执行渲染
+            // 4. Perform rendering
             tpl->Expand(html, &root);
         }
         void OneExpandHtml(const struct Question &q, std::string *html)

@@ -1,203 +1,176 @@
 # Load-balanced-online-OJ-system
 
-***
+<a href="https://github.com/ffengc">
+    <img src="https://img.shields.io/static/v1?label=Github&message=ffengc&color=blue" alt="ffengc.github">
+</a>
+<a href="https://ffengc.github.io">
+    <img src="https://img.shields.io/static/v1?label=Page&message=ffengc.github.io&color=red" alt="ffengc.github.io">
+</a>
+<a href="https://ffengc.github.io/gh-blog/">
+    <img src="https://img.shields.io/static/v1?label=Blog&message=Blog Page&color=brightgreen" alt="Mutable.ai Auto Wiki">
+</a>
 
-- **[简体中文](./README-CN.md)**
-- **[English](./README.md)**
 
-***
+- [简体中文](./README-CN.md)
+- [English](./README.md)
 
-## Load-balanced-online-OJ-system
+> [!NOTE]
+> If you have any questions about the operation and implementation of this project, or have better optimization suggestions for this project, you can contact me directly or leave a message in the issue of the repository.
 
-The detailed code details of the project implementation are shown in the following files.
+- [Load-balanced-online-OJ-system](#load-balanced-online-oj-system)
+  - [Basic information of the project](#basic-information-of-the-project)
+  - [Project module architecture](#project-module-architecture)
+  - [Project operation effect](#project-operation-effect)
+  - [Configuration and Run](#configuration-and-run)
+    - [Install Boost Library](#install-boost-library)
+    - [Install Ctemplate](#install-ctemplate)
+    - [Clone the repository and run the project](#clone-the-repository-and-run-the-project)
+    - [Configure cr host](#configure-cr-host)
+    - [Modify/adjust the topic](#modifyadjust-the-topic)
+  - [Project implementation details](#project-implementation-details)
 
-- **[./Work.md](./Work.md)**
 
-## 1. Project Description
+## Basic information of the project
 
-Implement an online programming system similar to leetcode.
+**Project name:** Self-made online programming judging system (Online Judge)
 
-Multiple compilation service hosts (cr hosts) can be deployed in the background, and then the oj_server service will load-balancedly deploy a large number of submission requests to each cr host through algorithms. If the cr host in the background hangs up, oj_server can also correctly identify it.
+**Project description:** This project aims to create an online programming judging system similar to LeetCode, allowing users to write code in the browser, submit and evaluate the correctness and performance of their code in real time. The system supports multiple programming languages ​​and can provide instant feedback and detailed error analysis.
 
-The architecture is as follows.
+**Core functions:**
+- Question browsing and coding: Users can browse the questions in the question bank, each question has a corresponding description, example and initial code framework.
+- Code editing and real-time evaluation: Use Ace editor to edit code in the browser, supporting basic syntax highlighting and code completion.
+- Code submission and judging: The code submitted by the user will be sent to the server for compilation and execution, and the server will evaluate the correctness and efficiency of the code according to the preset test cases.
+- Load balancing: Use a custom load balancing algorithm to intelligently select the server with the lowest load for code compilation and execution to optimize resource usage and response time.
+- Result feedback: Users can receive detailed execution result feedback, including execution output, error information and performance indicators.
 
+**Technology stack:**
+
+- Front-end: HTML, CSS, JavaScript (using Ace editor)
+- Back-end: C++, Boost library, JSON for Modern C++, ctemplate (for HTML template rendering)
+- Server communication: Use cpp-httplib library to handle HTTP requests
+- Data storage: Questions and user codes are stored in the file system
+- Load balancing: Self-implemented load balancing algorithm, intelligently distributes requests based on the current active server load
+
+**Project highlights:**
+- Self-developed load balancing system: Utilizes simple load monitoring and dynamic server selection mechanism to optimize system resource allocation and processing speed.
+- Fully customized coding environment: The integrated Ace code editor provides a coding experience similar to desktop IDE, including syntax highlighting, code folding and automatic completion.
+- Modular design: The project is highly modularized, with clear separation of front-end display, back-end logic processing and data management, which is easy to maintain and expand.
+- Extensive technical application: Combining the advanced features of modern C++ and multiple open source libraries, it demonstrates the integrated use of cross-language and frameworks in practical applications.
+
+
+## Project module architecture
 
 ![](./README.figs/10.png)
 
-## 2. Technologies and development environments used
-
-**Technology used**
-
-> C++STL, Boost quasi-standard library, cpp-httplib third-party open source network library, ctemplate third-party open source front-end web page rendering library, jsoncpp third-party serialization and deserialization library, load balancing design, distributed system, multi-process and multi-threading Control, Mysql C Connect, Ace front-end editor, html/css/js/jquery/ajax
-
-**Development Environment**
-
-- centos server
-- vscode
-
-## 3. Project operation display
-
-### 3.1 Page display
-
-Homepage.
+## Project operation effect
 
 ![](./README.figs/1.png)
-
-题目列表（可继续增加题目）
-
 ![](./README.figs/2.png)
-
-Answer interface.
-
 ![](./README.figs/3.png)
-
-答案/编译出现错误样例。
-
 ![](./README.figs/4.png)
-
-代码补全。
-
 ![](./README.figs/5.png)
 
-### 3.2 Backend display
+## Configuration and Run
 
-Compile service backend interface
+### Install Boost Library
 
-![](./README.figs/6.png)
+**Installation on Ubuntu:**
 
-oj service backend.
-
-![](./README.figs/7.png)
-
-Submit multiple times instantly to check the load balancing situation.
-
-![](./README.figs/8.png)
-
-![](./README.figs/9.png)
-
-It can be seen that oj_server can achieve load balancing very well, and every background host can get requests.
-
-## 4. How to download and run
-
-### 4.1 run
-
-clone the repo。
-
-```bash
-git clone https://github.com/Yufccode/Load-balanced-online-OJ-system.git
+Open the terminal.
+Type the following command to update the system's package index:
+```
+sudo apt update
+```
+安装 Boost 库：
+```
+sudo apt install libboost-all-dev
 ```
 
-enter the repo。
+**Installation on CentOS:**
 
+Open a terminal.
+First install the EPEL repository to ensure all dependencies can be found:
 ```
-cd Load-balanced-online-OJ-system;
-cd online_judge
+sudo yum install epel-release
 ```
-
-Compile to generate executable。
-
-```bash
-make
+Install the Boost library:
 ```
-
-At this time, there is already an executable in the oj_server directory and compile_server directory respectively.。
-
-Then start compile_server under three command lines, and then start oj_server under the fourth command line.
-
-```bash
-# Three command lines execute these three respectively
-./compile_server 8081
-./compile_server 8082
-./compile_server 8083
+sudo yum install boost-devel
 ```
 
-```bash
+**Installation on CentOS:**
+
+1. Open a terminal.
+2. Make sure the EPEL repository is installed, then install JsonCpp:
+```
+sudo yum install jsoncpp-devel
+```
+
+### Install Ctemplate
+
+**Installation on Ubuntu:**
+
+Open a terminal.
+Update the system's package index:
+```
+sudo apt update
+```
+Installation of Ctemplate:
+```
+sudo apt install libctemplate-dev
+```
+
+**Installation on CentOS:**
+
+Open a terminal.
+Install Ctemplate:
+```
+sudo yum install ctemplate
+```
+
+### Clone the repository and run the project
+
+```sh
+git clone https://github.com/ffengc/Load-balanced-online-OJ-system.git;
+cd Load-balanced-online-OJ-system/online_judge;
+make clean;make;
+```
+
+Set the environment variables:
+```sh
 export LD\_LIBRARY\_PATH=$LD\_LIBRARY\_PATH:/usr/local/lib # set the env
-./oj_server # The fourth command line executes this command
 ```
 
-Just browse to port 8080 in your browser.
+run `oj_server`:
 
-![](./README.figs/11.png)
-
-If it is a cloud server, remember to open the firewall, otherwise it will not be accessible.
-
-### 4.2 Add/adjust the host of the cr service or deploy the cr service to the remote end
-
-The default is now three cr service hosts. You can add it and just modify the configuration file.
-
-```
-./oj_server/conf/service_machine.conf
+```sh
+cd oj_server;
+./oj_server
 ```
 
+run `compile_server`:
+
+```sh
+cd compile_server;
+./compile_server 8081
 ```
+
+### Configure cr host
+
+Configuration Files: `online_judge/oj_server/conf/service_machine.conf`
+
+```conf
 127.0.0.1:8081
 127.0.0.1:8082
 127.0.0.1:8083
 ```
 
-Just change the configuration inside. It's very simple. If you want to deploy to the remote end, just change it to your remote IP. Then if you want to add a host, just add it directly later.
+### Modify/adjust the topic
 
-### 4.3 publish project
+dir: `online_judge/oj_server/questions`
 
-Just call the `makefile` file in the top directory.
+Just configure it according to the format in the directory.
 
-```bash
-make
-```
+## Project implementation details
 
-After make, there will be a `make_output` directory, which contains the content to be published.
-
-## 5. How to add questions
-
-So the question information is stored in this directory.
-
-```
-./oj_server/questions
-```
-
-The directory structure is shown below.
-
-```
-.
-├── 1
-│   ├── desc.txt
-│   ├── header.cpp
-│   └── tail.cpp
-├── 2
-│   ├── desc.txt
-│   ├── header.cpp
-│   └── tail.cpp
-├── 3
-│   ├── desc.txt
-│   ├── header.cpp
-│   └── tail.cpp
-├── 4
-│   ├── desc.txt
-│   ├── header.cpp
-│   └── tail.cpp
-└── question.list
-
-4 directories, 13 files
-```
-
-question.list format.
-
-```
-1 字符串长度 简单 1 30000
-2 判断回文数 中等 1 30000
-3 求最大值 简单 1 30000
-4 N皇后 困难 1 30000
-```
-
-Each column is the question list, question name, difficulty, CPU running time limit, and memory usage limit.
-
-Each folder named with a number represents detailed information for each topic.
-
-`desc.txt` is the topic description and some detailed information.
-
-`header.cpp` is the code snippet displayed to the user.
-
-`tail.cpp` is the code snippet used by the backend for testing.
-
-To add questions, just follow the above format.
+- **[work.md](./Work.md)** (Chinese only)
