@@ -1,11 +1,11 @@
-n 皇后问题 研究的是如何将 n 个皇后放置在 n × n 的棋盘上，并且使皇后彼此之间不能相互攻击。
-给你一个整数 n ，返回 n 皇后问题 不同的解决方案的数量。
+The n-queens problem studies how to place n queens on an n × n chessboard without the queens attacking each other.
+Given an integer n, return the number of different solutions to the n-queens problem.
 
-示例1:
-输入：n = 4
-输出：2
-解释：4皇后问题存在两个不同的解法。
+Example 1:
+Input: n = 4
+Output: 2
+Explanation: There are two different solutions to the 4-queens problem.
 
-示例2:
-输入：n = 1
-输出：1
+Example 2:
+Input: n = 1
+Output: 1

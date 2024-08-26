@@ -16,14 +16,17 @@
             font-family: 'Roboto', sans-serif;
         }
 
-        body, html {
+        body,
+        html {
             width: 100%;
             height: 100%;
-            background-color: #f4f4f4; /* Light grey background */
+            background-color: #f4f4f4;
+            /* Light grey background */
         }
 
         .navbar {
-            background-color: #333; /* Darker shade */
+            background-color: #333;
+            /* Darker shade */
             color: white;
             display: flex;
             justify-content: space-between;
@@ -43,8 +46,10 @@
             padding: 10px 15px;
         }
 
-        .navbar a:hover, .navbar a:focus {
-            background-color: #555; /* Slightly lighter shade for hover */
+        .navbar a:hover,
+        .navbar a:focus {
+            background-color: #555;
+            /* Slightly lighter shade for hover */
         }
 
         .content {
@@ -52,11 +57,15 @@
             margin: 50px auto;
             padding: 20px;
             background-color: white;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Add shadow for depth */
-            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            /* Add shadow for depth */
+            border-radius: 8px;
+            /* Rounded corners */
         }
 
-        .content h1, .content p, .content h2 {
+        .content h1,
+        .content p,
+        .content h2 {
             margin-bottom: 20px;
         }
 
@@ -65,11 +74,13 @@
         }
 
         .content a {
-            color: #007BFF; /* Bootstrap default blue */
+            color: #007BFF;
+            /* Bootstrap default blue */
             text-decoration: none;
         }
 
-        .content a:hover, .content a:focus {
+        .content a:hover,
+        .content a:focus {
             text-decoration: underline;
         }
     </style>
@@ -78,17 +89,21 @@
 <body>
     <div class="navbar">
         <div class="links">
-            <a href="#">Home</a>
+            <a href="/">Home</a>
             <a href="/all_questions">Questions</a>
-            <a href="#">Competitions</a>
-            <a href="#">Discussions</a>
-            <a href="#">Careers</a>
+            <a href="https://github.com/ffengc">Github</a>
+            <a href="https://ffengc.github.io">HomePage</a>
         </div>
         <a href="#">Login</a>
     </div>
     <div class="content">
         <h1>Welcome to the OnlineJudge System</h1>
-        <p>This is my independently developed online OJ platform.</p>
+        <p>This is an online OJ platform developed by ffengc.
+            <br><strong>Abstract: </strong>The project aims to create an online programming
+            assessment system similar to LeetCode, allowing users to write code in the browser, submit and evaluate
+            the correctness and performance of their code in real time. The system supports multiple programming
+            languages and can provide instant feedback and detailed error analysis.
+        </p>
         <h2>
             <a href="/all_questions">Click me to start coding now!</a>
         </h2>
