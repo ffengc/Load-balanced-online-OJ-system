@@ -65,11 +65,11 @@
 
 ## 项目运行效果
 
-![](./README.figs/1.png)
-![](./README.figs/2.png)
-![](./README.figs/3.png)
-![](./README.figs/4.png)
-![](./README.figs/5.png)
+<div align="center">
+
+https://github.com/user-attachments/assets/de89c038-8551-4ab0-88d9-4cdd4c84db8b
+
+</div>
 
 ## 配置运行
 
