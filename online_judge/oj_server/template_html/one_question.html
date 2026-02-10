@@ -6,155 +6,146 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{number}}.{{title}}</title>
-    <!-- 引入ACE插件 -->
-    <!-- 官网链接:https://ace.c9.io/ -->
-    <!-- CDN链接:https://cdnjs.com/libraries/ace -->
-    <!-- 使用介绍:https://www.iteye.com/blog/ybc77107-2296261 -->
-    <!-- https://justcode.ikeepstudying.com/2016/05/ace-editor-
-%E5%9C%A8%E7%BA%BF%E4%BB%A3%E7%A0%81%E7%BC%96%E8%BE%91%E6%9E%81%E5%85%B6%E9%AB%98%E4%BA%AE/
--->
-    <!-- 引入ACE CDN -->
+    <!-- ACE Editor Plugin Links -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js" type="text/javascript"
         charset="utf-8"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ext-language_tools.js" type="text/javascript"
         charset="utf-8"></script>
-    <!-- 引入jquery CDN -->
+    <!-- jQuery CDN -->
     <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
     <style>
-        * {
+        body {
             margin: 0;
             padding: 0;
+            height: 100vh;
+            background-color: #f0f0f0;
+            /* Light grey background for the whole page */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
         }
 
-        html,
-        body {
+        .container {
+            width: 98vw;
+            /* Full viewport width with slight margin */
+            height: 98vh;
+            /* Full viewport height with slight margin */
+            background-color: white;
+            /* White background inside the container */
+            border: 1px solid rgba(0, 0, 0, 0.376);
+            /* Black border for the container */
+            border-radius: 8px;
+            /* Slight rounded corners */
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-buttons {
+            align-self: flex-start;
+            margin: 10px 10px 0 10px;
+        }
+
+        .button {
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            /* Spacing between buttons */
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        .part1 {
+            flex: 1;
+            /* Takes up all available space */
+            display: flex;
             width: 100%;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.058);
+            /* Black border for the container */
+            border-radius: 8px;
+            /* Slight rounded corners */
+        }
+
+        .left_desc,
+        .right_code {
+            flex: 1;
+            /* Equally split the available space */
+            overflow: auto;
+            padding: 10px;
+            border: 1px solid rgba(226, 245, 228, 0.506);
+            border-radius: 8px;
+        }
+
+        .left_desc {
+            border: 1px solid rgba(226, 245, 228, 0.506);
+            border-radius: 8px;
+        }
+
+        .left_desc h3 {
+            margin-top: 20px;
+            /* Ensure spacing for buttons */
+            font-size: x-large;
+        }
+
+        .left_desc pre {
+            margin-top: 20px;
+            /* Ensure spacing for buttons */
+            font-size: large;
+        }
+
+        .ace_editor {
             height: 100%;
         }
 
-        .container .navbar {
-            width: 100%;
-            height: 50px;
-            background-color: black;
-            /* 给父级标签设置overflow，取消后续float带来的影响 */
-            overflow: hidden;
+        .part2 {
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            border: 1px solid rgba(0, 0, 0, 0.058);
+            /* Black border for the container */
+            border-radius: 8px;
+            /* Slight rounded corners */
         }
 
-        .container .navbar a {
-            /* 设置a标签是行内块元素，允许你设置宽度 */
-            display: inline-block;
-            /* 设置a标签的宽度,a标签默认行内元素，无法设置宽度 */
-            width: 80px;
-            /* 设置字体颜色 */
-            color: white;
-            /* 设置字体的大小 */
-            font-size: large;
-            /* 设置文字的高度和导航栏一样的高度 */
-            line-height: 50px;
-            /* 去掉a标签的下划线 */
-            text-decoration: none;
-            /* 设置a标签中的文字居中 */
-            text-align: center;
-        }
-
-        /* 设置鼠标事件 */
-        .container .navbar a:hover {
-            background-color: green;
-        }
-
-        .container .navbar .login {
-            float: right;
-        }
-
-        .container .part1 {
-            width: 100%;
-            height: 600px;
-            overflow: hidden;
-        }
-
-        .container .part1 .left_desc {
-            width: 50%;
-            height: 600px;
-            float: left;
-            overflow: scroll;
-        }
-
-        .container .part1 .left_desc h3 {
-            padding-top: 10px;
-            padding-left: 10px;
-        }
-
-        .container .part1 .left_desc pre {
-            padding-top: 10px;
-            padding-left: 10px;
-            font-size: medium;
-            font-family:'Times New Roman', Times, serif;
-        }
-
-        .container .part1 .right_code {
-            width: 50%;
-            float: right;
-        }
-
-        .container .part1 .right_code .ace_editor {
-            height: 600px;
-        }
-
-        .container .part2 {
-            width: 100%;
-            /* height: 185px;
-            height: 100%; */
-            overflow: hidden;
-            /* background-color: #e2e2e2; */
-        }
-
-        .container .part2 .result {
+        .result {
             width: 300px;
-            float: left;
+            overflow: auto;
         }
 
-        .container .part2 .btn-submit {
-            width: 120px;
-            height: 50px;
-            font-size: large;
-            float: right;
+        .btn-submit {
+            padding: 10px 20px;
             background-color: #0aa610;
-            color: #FFF;
-            /* 给按钮带上圆角 */
-            border-radius: 1ch;
-            border: 0px;
-            margin-top: 10px;
-            margin-right: 10px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
 
-        .container .part2 button:hover {
-            background-color: rgb(1, 91, 1);
-        }
-
-        .container .part2 .result {
-            margin-top: 15px;
-            margin-left: 15px;
-        }
-
-        .container .part2 .result pre {
-            font-size: large;
+        .btn-submit:hover {
+            background-color: #008000;
+            /* Darker green on hover */
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <!-- 导航栏， 功能不实现-->
-        <div class="navbar">
-            <a href="/">首页</a>
-            <a href="/all_questions">题库</a> <a href="#">竞赛</a>
-            <a href="#">讨论</a>
-            <a href="#">求职</a>
-            <a class="login" href="#">登录</a>
-        </div>
-        <!-- 左右呈现，题目描述和预设代码 -->
         <div class="part1">
             <div class="left_desc">
+                <div class="top-buttons">
+                    <a href="/" class="button">Home</a>
+                    <a href="/all_questions" class="button">Question List</a>
+                </div>
                 <h3><span id="number">{{number}}</span>.{{title}}_{{star}}</h3>
                 <pre>{{desc}}</pre>
             </div>
@@ -162,85 +153,50 @@
                 <pre id="code" class="ace_editor"><textarea class="ace_text-input">{{pre_code}}</textarea></pre>
             </div>
         </div>
-        <!-- 提交并且得到结果，并显示 -->
         <div class="part2">
             <div class="result"></div>
-            <button class="btn-submit" onclick="submit()">提交代码</button>
+            <button class="btn-submit" onclick="submit()">Submit Your Code</button>
         </div>
     </div>
     <script>
-        //初始化对象
-        editor = ace.edit("code");
-        //设置风格和语言(更多风格和语言，请到github上相应目录查看)
-        // 主题大全:http://www.manongjc.com/detail/25-cfpdrwkkivkikmk.html 
+        // Initialize ACE Editor
+        var editor = ace.edit("code");
         editor.setTheme("ace/theme/textmate");
         editor.session.setMode("ace/mode/c_cpp");
-        // 字体大小
         editor.setFontSize(16);
-        // 设置默认制表符的大小: 
         editor.getSession().setTabSize(4);
-        // 设置只读(true时只读，用于展示代码) 
         editor.setReadOnly(false);
-        // 启用提示菜单 
         ace.require("ace/ext/language_tools");
         editor.setOptions({
             enableBasicAutocompletion: true,
             enableSnippets: true,
             enableLiveAutocompletion: true
         });
+
         function submit() {
-            // alert("嘿嘿!");
-            // 1. 收集当前页面的有关数据, 1. 题号 2.代码
             var code = editor.getSession().getValue();
-            // console.log(code);
-            var number = $(".container .part1 .left_desc h3 #number").text();
-            // console.log(number);
+            var number = $("#number").text();
             var judge_url = "/judge/" + number;
-            // console.log(judge_url);
-            // 2. 构建json，并通过ajax向后台发起基于http的json请求
             $.ajax({
-                method: 'Post', // 向后端发起请求的方式
-                url: judge_url, // 向后端指定的url发起请求
-                dataType: 'json', // 告知server，我需要什么格式
-                contentType: 'application/json;charset=utf-8', // 告知server，我给你的是什么
+                method: 'Post',
+                url: judge_url,
+                dataType: 'json',
+                contentType: 'application/json;charset=utf-8',
                 data: JSON.stringify({
                     'code': code,
                     'input': ''
                 }),
-                success: function (data) { //成功得到结果
-                    // console.log(data);
+                success: function (data) {
                     show_result(data);
                 }
             });
-            // 3. 得到结果，解析并显示到 result中 
             function show_result(data) {
-                // console.log(data.status);
-                // console.log(data.reason);
-                // 拿到result结果标签
-                var result_div = $(".container .part2 .result"); // 清空上一次的运行结果
+                var result_div = $(".result");
                 result_div.empty();
-                // 首先拿到结果的状态码和原因结果 
-                var _status = data.status; 
-                var _reason = data.reason;
-                var reason_lable = $("<p>", {
-                    text: _reason
-                });
-                reason_lable.appendTo(result_div);
-                if (status == 0) {
-                    // 请求是成功的，编译运行过程没出问题，但是结果是否通过看测试用例的结果 
-                    var _stdout = data.stdout;
-                    var _stderr = data.stderr;
-                    var stdout_lable = $("<pre>", {
-                        text: _stdout
-                    });
-                    var stderr_lable = $("<pre>", {
-                        text: _stderr
-                    })
-                    stdout_lable.appendTo(result_div);
-                    stderr_lable.appendTo(result_div);
-                }
-                else {
-                    // 编译运行出错,do nothing
+                $("<p>", { text: data.reason }).appendTo(result_div);
+                if (data.status == 0) {
+                    $("<pre>", { text: data.stdout }).appendTo(result_div);
+                    $("<pre>", { text: data.stderr }).appendTo(result_div);
                 }
             }
         }

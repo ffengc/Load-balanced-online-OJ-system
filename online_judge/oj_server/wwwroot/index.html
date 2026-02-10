@@ -4,103 +4,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>这个我的个人OJ系统</title>
-    <!-- 网页的样式 -->
+    <title>My Personal OJ System</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Web page styles -->
     <style>
         * {
-            /* 消除网页默认外边距 */
-            margin: 0px;
-            /* 消除网页的默认内边距 */
-            padding: 0px;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
         }
 
-        html,
-        body {
+        body,
+        html {
             width: 100%;
             height: 100%;
+            background-color: #f4f4f4;
+            /* Light grey background */
         }
 
-        .container .navbar {
-            width: 100%;
-            height: 50px;
-            background-color: black;
-            /* 给父级标签设置overflow，取消后续float带来的影响 */
-            overflow: hidden;
-        }
-
-        .container .navbar a {
-            display: inline-block;
-            /* 设置a标签的宽度 */
-            width: 80px;
-            /* 设置字体 */
+        .navbar {
+            background-color: #333;
+            /* Darker shade */
             color: white;
-            font-size: larger;
-            /* 上下居中 */
-            line-height: 50px;
-            /* 文字和导航栏同样高度 */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            height: 60px;
+        }
+
+        .navbar .links {
+            display: flex;
+        }
+
+        .navbar a {
+            color: white;
             text-decoration: none;
-            /* 设置文字居中 */
-            text-align: center;
+            font-size: 16px;
+            padding: 10px 15px;
         }
 
-        /* 设置鼠标事件 */
-        .container .navbar a:hover {
-            background-color: green;
+        .navbar a:hover,
+        .navbar a:focus {
+            background-color: #555;
+            /* Slightly lighter shade for hover */
         }
 
-        .container .navbar .login {
-            float: right;
+        .content {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            /* Add shadow for depth */
+            border-radius: 8px;
+            /* Rounded corners */
         }
 
-        .container .content {
-            width: 800px;
-            /* background-color: #ccc; */
-            /* 整体居中 */
-            margin: 0px auto;
-            /* 设置文字居中 */
-            text-align: center;
-            /* 设置上外边距 */
-            margin-top: 200px;
+        .content h1,
+        .content p,
+        .content h2 {
+            margin-bottom: 20px;
         }
 
-        .container .content .font_ {
-            /* 设置标签为块级元素，独占一行，可以设置高度宽度等属性 */
-            display: block;
-            /* 设置上外边距 */
-            margin-top: 20px;
-            /* 去掉下划线 */
+        .content h1 {
+            color: #333;
+        }
+
+        .content a {
+            color: #007BFF;
+            /* Bootstrap default blue */
             text-decoration: none;
         }
-        
-        /* Adjust the font size for the header */
-        .container .content .font_:first-child {
-            font-size: 40px; /* You can adjust the size as needed */
-        }
-        .container .content .font_:nth-child(2) {
-            font-size: 28px; /* You can adjust the size as needed */
+
+        .content a:hover,
+        .content a:focus {
+            text-decoration: underline;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <!-- 导航栏 功能不实现-->
-        <div class="navbar">
-            <a href="#">首页</a>
-            <a href="/all_questions">题库</a>
-            <a href="#">竞赛</a>
-            <a href="#">讨论</a>
-            <a href="#">求职</a>
-            <a class="login" href="#">登录</a>
+    <div class="navbar">
+        <div class="links">
+            <a href="/">Home</a>
+            <a href="/all_questions">Questions</a>
+            <a href="https://github.com/ffengc">Github</a>
+            <a href="https://ffengc.github.io">HomePage</a>
         </div>
-        <!-- 网页的内容 -->
-        <div class="content">
-            <h1 class="font_">~~Welcome to OnlineJudge System~~</h1>
-            <p class="font_">这个是我独立开发的在线OJ平台</p>
-            <h2 class="font_">
-                <a href="/all_questions">点击我开始编程啦～</a>
-            </h2>
-        </div>
+        <a href="#">Login</a>
+    </div>
+    <div class="content">
+        <h1>Welcome to the OnlineJudge System</h1>
+        <p>This is an online OJ platform developed by ffengc.
+            <br><strong>Abstract: </strong>The project aims to create an online programming
+            assessment system similar to LeetCode, allowing users to write code in the browser, submit and evaluate
+            the correctness and performance of their code in real time. The system supports multiple programming
+            languages and can provide instant feedback and detailed error analysis.
+        </p>
+        <h2>
+            <a href="/all_questions">Click me to start coding now!</a>
+        </h2>
     </div>
 </body>
 
