@@ -173,4 +173,4 @@ Just configure it according to the format in the directory.
 
 ## Project implementation details
 
-- **[work.md](./Work.md)** (Chinese only)
+- **[work.md](./Work.md)**
