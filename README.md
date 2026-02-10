@@ -12,7 +12,7 @@
 
 The detailed code details of the project implementation are shown in the following files.
 
-- **[./Work.md](./Work.md)**
+- **[./Work.md](./Work.md)** | **[中文版](./Work-CN.md)**
 
 ## 1. Project Description
 

@@ -7,7 +7,7 @@
 
 代码的实现细节可见
 
-- **[./Work.md](./Work.md)**
+- **[./Work-CN.md](./Work-CN.md)** | **[English](./Work.md)**
 
 ## 1. 项目简介
 

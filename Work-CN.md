@@ -1,4 +1,4 @@
-# Load-balanced Online OJ System
+# 负载均衡OJ系统
 
 ***
 
@@ -7,63 +7,63 @@
 
 ***
 
-Project start date: October 14, 2023
+开题日期：2023年10月14日
 
 
-## 1. Project Introduction
+## 1. 项目简介
 
-Implement an online programming system similar to LeetCode.
+实现类似leetcode的在线编程系统。
 
-## 2. Technologies and Development Environment
+## 2. 所用技术和开发环境
 
-**Technologies Used**
+**所用技术**
 
-> C++ STL, Boost quasi-standard library, cpp-httplib third-party open source network library, ctemplate third-party open source frontend page rendering library, jsoncpp third-party serialization/deserialization library, load balancing design, distributed system, multi-process and multi-threading control, MySQL C Connect, Ace frontend editor, html/css/js/jquery/ajax
+> C++STL、Boost准标准库、cpp-httplib第三方开源网络库、ctemplate第三方开源前端网页渲染库、jsoncpp第三方序列化反序列化库、负载均衡设计、分布式系统、多进程多线程控制、Mysql C Connect、Ace前端在前编辑器、html/css/js/jquery/ajax
 
-**Development Environment**
+**开发环境**
 
-- CentOS server
-- VSCode
+- centos服务器
+- vscode
 
 ***
 
-Let's start development.
+开始开发。
 
-## 3. Project Preparation
+## 3. 项目准备工作
 
-### 3.1 Project Directory Structure
+### 3.1 项目目录结构
 
-First, prepare the directory structure.
+先把目录结构准备好。
 
 ![](./figs/1.png)
 
-> 1. comm: Common module
-> 2. compile_server: Compilation and execution module
-> 3. oj_server: Get problem list, view problems, coding interface, load balancing, and other features
+> 1. comm: 公共模块
+> 2. compile_server: 编译与运行模块
+> 3. oj_server: 获取题目列表，查看题目编写题目洁面，负载均衡，其他功能
 
-### 3.2 Project Macro Architecture
+### 3.2 项目宏观结构
 
 ![](./figs/2.png)
 
-**If the client only requests the problem list or a specific problem's editing page, we just need to query the database directly.**
+**如果客户只是请求题目列表、请求特定题目的编写，我们只需要直接找数据库就行了。**
 
-**But if the client submits code, we need to use the load-balanced distributed algorithm to route to the compilation module.**
+**但是客户如果提交代码了，我们就要通过负载均衡分布式算法，找编译部分去做事情。**
 
-### 3.3 Development Order
+### 3.3 编写顺序
 
-1. First, write the compile_server
-2. Then write the oj_server
-3. Write version 1: file-based system
-4. Introduce frontend page design
-5. Write version 2: database-based system
+1. 先编写compile_server
+2. 然后编写oj_server
+3. 编写version1：基于文件版本系统
+4. 引入前端页面设计
+5. 编写version2：基于数据库版本的系统
 
-## 4. Compilation Service Design
+## 4. 编译服务设计
 
-### 4.1 Preparation
+### 4.1 准备工作
 
-The service provided is: compile our code, run the code, and get formatted results.
+提供的服务是：编译我们的代码，运行代码，得到格式化的结果。
 
-First, set up the required files.
+先把要用的文件建立好。
 
 ```bash
 yufc@ALiCentos7:~/Src/Bit-Project/online_judge/compile_server$ tree .
@@ -78,30 +78,30 @@ yufc@ALiCentos7:~/Src/Bit-Project/online_judge/compile_server$ tree .
 yufc@ALiCentos7:~/Src/Bit-Project/online_judge/compile_server$
 ```
 
-Let's write `compiler.hpp` first.
+我们现在先写`compiler.hpp`。
 
-We assume there is already a source code file (temporary file), and this compiler.hpp will compile that temporary file.
+我们假设现在已经有一个源代码文件（临时文件），我们这个compiler.hpp去编译这个临时文件。
 
-Of course, when compiling, there are only two possible outcomes:
+当然如果是要编译的话，无非就是两种结果。
 
-1. Compilation succeeds
-2. Compilation fails
+1. 编译通过
+2. 编译出错
 
-Therefore, after a compilation error, the error information needs to be saved in a temporary file. Originally it would go to the display, but now it needs to be shown to the user — this is called redirection!
+因此我们编译出错之后，出错信息肯定需要一个临时文件来进行保存，但是本来就是放到显示器去的，但是现在需要展示给用户，这个工作叫做重定向！
 
-Also, compilation should not be done by our process itself; it should be done by a forked child process.
+另外，编译这个东西，肯定不是我们的进程去做的，肯定是要fork去做的。
 
-So we can draw the overall structure of the compilation service.
+所以我们可以画出编译服务这一部分的整体结构了。
 
 ![](./figs/3.png)
 
-Then we can start writing.
+然后我们就可以开始写了。
 
-### 4.2 Main Structure Implementation
+### 4.2 主要结构编写
 
-Use a core function `static bool Compile(const std::string &file_name)` to perform the compilation work.
+用一个核心的函数`static bool Compile(const std::string &file_name)`来进行编译的工作。
 
-The input is the temporary file we mentioned.
+然后传入的就是我们说的临时文件
 
 ```cpp
 #ifndef __YUFC_COMPILER_HPP__
@@ -109,7 +109,7 @@ The input is the temporary file we mentioned.
 #include <iostream>
 #include <algorithm>
 #include <unistd.h>
-// Only responsible for code compilation
+// 只负责代码的编译
 namespace ns_compiler
 {
     class Compiler
@@ -121,17 +121,17 @@ namespace ns_compiler
         {
             /*
                 return value:
-                true: compilation succeeded
-                false: compilation failed
+                true: 编译成功
+                false: 编译失败
             */
             pid_t child_pro_pid = fork();
             if (child_pro_pid < 0)
             {
-                return false; // compilation failed
+                return false; // 编译失败
             }
             else if (child_pro_pid == 0)
             {
-                // Child process: call the compiler to complete the code compilation
+                // 子进程: 调用编译器，完成对代码的编译工作
             }
           	// ...
         }
@@ -141,13 +141,15 @@ namespace ns_compiler
 #endif
 ```
 
-Then after calling the child process, we use the exec family of functions to perform the operation.
+然后调用子进程之后，用程序替换的方法去进行操作就行了。
 
 ![](./figs/4.png)
 
-Since we are only calling `g++` here, which is definitely in the system path, we should choose one with 'p'. Here we choose `execlp` for program replacement.
+因为我们只在这里调用`g++`肯定在系统路经底下的。所以肯定选择带p的。
 
-Now the issue is that during the compilation process, many temporary files will be generated. Whether it's the correct source file, error information, or something else, we need to keep track of them, so let's create a temp directory.
+这里我们选择`execlp`来进行程序替换即可。
+
+好，现在的问题是，我们在编译过程中，肯定会产生大量的临时文件。比如到底是正确的源文件，还是错误信息，还是其他什么的，我们都要保存好，所以创建一个temp路经文件夹。
 
 ```bash
 yufc@ALiCentos7:~/Src/Bit-Project/online_judge/compile_server$ mkdir temp
@@ -161,37 +163,37 @@ yufc@ALiCentos7:~/Src/Bit-Project/online_judge/compile_server$ tree .
 └── temp
 
 1 directory, 5 files
-yufc@ALiCentos7:~/Src/Bit-Project/online_judge/compile_server$
+yufc@ALiCentos7:~/Src/Bit-Project/online_judge/compile_server$ 
 ```
 
 ```cpp
 /*
-    We assume that the incoming file_name has no suffix
-    So: file_name: 1234
+    我们认为，传进来的file_name是没有后缀的
+    所以: file_name: 1234
     1234 -> ./temp/1234.cpp
     1234 -> ./temp/1234.exe
     1234 -> ./temp/1234.stderr
 */
 ```
 
-Since we may need some string operations, we create `util.hpp` in the comm directory for common utilities.
+因此，我们可能涉及到字符串的一些操作，因此我们在comm的目录下创建`util.hpp`表示一些公用的工具。
 
 ![](./figs/5.png)
 
-After that, call the exec replacement function.
+搞定之后，调用程序替换函数。
 
 ```cpp
-execlp("g++", "-o", PathUtil::Exe(file_name).c_str(), PathUtil::Src(file_name), "-std=c++11", nullptr); // Don't forget this nullptr
+execlp("g++", "-o", PathUtil::Exe(file_name).c_str(), PathUtil::Src(file_name), "-std=c++11", nullptr); // 不要忘记这个nullptr
 ```
 
-Now we can write those string handling utility functions first.
+现在我们就可以先把处理字符串的那几个工具先写了。
 
-### 4.3 PathUtil Utility Implementation
+### 4.3 PathUtil工具编写
 
 ```cpp
 namespace ns_util
 {
-    const std::string temp_path_root = "./temp/"; // Global path
+    const std::string temp_path_root = "./temp/"; // 全剧路径
     class PathUtil
     {
     public:
@@ -204,20 +206,20 @@ namespace ns_util
         }
 
     public:
-        // Build the complete filename with source file path + suffix
+        // 构建源文件路径+后缀的完整文件名
         static std::string Src(const std::string &file_name)
         {
             /*
-                We assume the incoming file_name has no suffix.
+                我们认为传进来的这个file_name是不带任何后缀的。
             */
             return AddSuffix(file_name, ".cpp");
         }
-        // Build the complete filename with executable path + suffix
+        // 构建可执行程序路径+后缀的完整文件名
         static std::string Exe(const std::string &file_name)
         {
             return AddSuffix(file_name, ".exe");
         }
-        // Build the complete filename with stderr path + suffix
+        // 构建标准错误路径+后缀的完整文件名
         static std::string Stderr(const std::string &file_name)
         {
             return AddSuffix(file_name, ".stderr");
@@ -226,25 +228,25 @@ namespace ns_util
 } // namespace ns_util
 ```
 
-That's enough for now.
+暂时先这样写着。
 
-Then we can continue writing the main structure.
+然后我们可以继续编写主结构。
 
-### 4.4 Continue Writing the Main Structure
+### 4.4 继续编写主结构
 
-Now the `Compile` function looks like this:
+现在`Compile`函数是这样的。
 
 ```cpp
 static bool Compile(const std::string &file_name)
 {
     /*
         return value:
-        true: compilation succeeded
-        false: compilation failed
+        true: 编译成功
+        false: 编译失败
     */
     /*
-        We assume that the incoming file_name has no suffix
-        So: file_name: 1234
+        我们认为，传进来的file_name是没有后缀的
+        所以: file_name: 1234
         1234 -> ./temp/1234.cpp
         1234 -> ./temp/1234.exe
         1234 -> ./temp/1234.stderr
@@ -252,14 +254,14 @@ static bool Compile(const std::string &file_name)
     pid_t child_pro_pid = fork();
     if (child_pro_pid < 0)
     {
-        return false; // compilation failed
+        return false; // 编译失败
     }
     else if (child_pro_pid == 0)
     {
-        // Child process: call the compiler to complete the code compilation
+        // 子进程: 调用编译器，完成对代码的编译工作
         // g++ -o target src -std=c++11
         execlp("g++", "-o", PathUtil::Exe(file_name).c_str(), \
-               PathUtil::Src(file_name), "-std=c++11", nullptr); // Don't forget this nullptr
+               PathUtil::Src(file_name), "-std=c++11", nullptr); // 不要忘记这个nullptr
     }
   	else
     {
@@ -268,19 +270,21 @@ static bool Compile(const std::string &file_name)
 }
 ```
 
-Let's continue writing. Since we called execlp, we need to know the result of the program execution, so we definitely need to wait.
+我们继续编写，我们既然execpl了，我们要知道程序运行的结果，我们肯定要等啊。
 
-After calling `waitpid()`, how do we determine if compilation was successful?
+我们调用`waitpid()`之后。
 
-We can check by verifying whether the file exists.
+如何判断编译是否成功呢？
 
-If `1234.exe` exists, it means compilation was successful. And so on.
+我么你可以通过判断文件是否存在的方式进行判断。
+
+如果`1234.exe`存在，表明编译成功了。以此类推。
 
 ```cpp
 else
 {
     waitpid(child_pro_pid, nullptr, 0);
-    // Was compilation successful?
+    // 编译是否成功？
     if(FileUtil::IsFileExists(PathUtil::Exe(file_name)))
     {
         return true;
@@ -288,27 +292,27 @@ else
 }
 ```
 
-`IsFileExists` can be placed in `Util` for management.
+`IsFileExists`可以放到`Util`里面去管理。
 
 ```cpp
 class FileUtil
 {
 public:
-    static bool IsFileExists(const std::string &path_name)
+    static bool IsFileExists(const std::string &path_name) 
     {
     }
 };
 ```
 
-How do we check if a file exists? You could use the file-open approach — if the file opens successfully, the file exists. This method works but is a bit crude. Let's use another approach.
+那如何判断文件是否存在呢，其实可以用打开文件的方式，如果文件打开成功，文件就存在，这个方式是可以的。但是这个方法比较捞，我们用另一个方法。
 
 ![](./figs/6.png)
 
-This function can get the attributes of a file at a given path.
+这个方法可以获取到一个路径下文件的属性。
 
-`buf` is an output parameter containing the file attributes. We don't need to worry about it.
+`buf`是一个输出型参数，里面是文件的属性。我们不用管。
 
-The return value is an `int`. If getting the attributes succeeds, it returns 0; if it fails, it returns -1.
+返回值是一个`int`，如果获取属性成功了，返回0，如果获取失败返回-1。
 
 ```cpp
 class FileUtil
@@ -319,7 +323,7 @@ public:
         struct stat st;
         if (stat(path_name.c_str(), &st) == 0)
         {
-            // Successfully got file attributes
+            // 获取文件属性成功了
             return true;
         }
         return false;
@@ -327,47 +331,47 @@ public:
 };
 ```
 
-This part is mostly done now.
+现在这里其实这一部分完成差不多了。
 
-But what about error information? We need to redirect the error information, so let's do that now.
+但是，如果有错误信息呢，我们要重定向错误信息，所以我们现在就做这一步。
 
-Originally, error information was supposed to be printed to file descriptor 2. Now we redirect it to our file's file descriptor.
+原来错误信息就是要打印到2号文件描述符上的，现在重定向到我们的文件的文件描述符中去。
 
-Just use `dup2()`.
+用`dup2()`就行。
 
 ```cpp
  else if (child_pro_pid == 0)
 {
-    // Redirect error information
+    // 重定向错误信息
     int fd_stderr = open(PathUtil::Stderr(file_name).c_str(), O_CREAT | O_WRONLY, 644);
     if (fd_stderr < 0)
     {
         exit(1);
     }
-    // Redirect stderr to fd_stderr
+    // 重定向标准错误到 fd_stderr
     dup2(fd_stderr, 2);
 
-    // Child process: call the compiler to complete the code compilation
+    // 子进程: 调用编译器，完成对代码的编译工作
     // g++ -o target src -std=c++11
     execlp("g++", "g++", "-o", PathUtil::Exe(file_name).c_str(),
-           PathUtil::Src(file_name).c_str(), "-std=c++11", nullptr); // Don't forget this nullptr
+           PathUtil::Src(file_name).c_str(), "-std=c++11", nullptr); // 不要忘记这个nullptr
     exit(1);
 }
 ```
 
-**Note: Program replacement does not affect the process's file descriptor table.**
+**注意：程序替换不影响程序的文件描述符表。**
 
-But there's an issue! When an error occurs, we're currently returning directly, but ideally we should be logging. So in the next section, let's write the logging functionality first.
+但是！我们出现错误之后，现在是直接返回的，但是我们按道理是要打日志的。所以下一章节，我们先把日志功能给写好。
 
-## 5. Log Module Implementation
+## 5. 日志功能编写
 
-This is quite simple and easy to understand. Here's the main structure code first.
+这个和简单，很好理解，先上主体结构的代码。
 
 ```cpp
 namespace ns_log
 {
     using namespace ns_util;
-    enum // Log levels
+    enum // 日志等级
     {
         INFO,
         DEBUG,
@@ -378,38 +382,38 @@ namespace ns_log
     // Log() << "message"
     std::ostream &Log(const std::string &level, const std::string &file_name, int line)
     {
-        // Add log level
+        // 添加日志等级
         std::string message = "[";
         message += level;
         message += "]";
-        // Add error file name
+        // 添加报错文件名称
         message += "[";
         message += file_name;
         message += "]";
-        // Add error line
+        // 添加报错行
         message += "[";
         message += std::to_string(line);
         message += "]";
-        // Log timestamp
+        // 日志时间戳
         message += "[";
         message += TimeUtil::GetTimeStamp();
         message += "]";
 
-        // cout internally contains a buffer
-        std::cout << message; // Don't use endl to flush
+        // cout 本质内部是包含缓冲区的
+        std::cout << message; // 不要endl进行刷新
 
         return std::cout;
     }
 }
 ```
 
-But we don't want to call it with so many parameters in the future. We want `LOG(level) << "hello"` to work, so we define a macro.
+但是我们将来不想这样调用，传这么多参数，我们希望`LOG(level) << "hello"`这样就能调用了，因此我们定义一个宏。
 
 ```cpp
 #define LOG(level) Log(#level, __FILE__, __LINE__);
 ```
 
-The code for getting the time is as follows.
+然后获取时间的代码如下。
 
 ```cpp
 class TimeUtil
@@ -424,11 +428,11 @@ public:
 };
 ```
 
-That works.
+这样就没问题了。
 
-## 6. Run Module
+## 6. 运行功能
 
-Now we can successfully obtain an executable, so now we need to execute it.
+现在我们已经可以顺利得得到一个可执行了，那么现在我们肯定是要去执行这个可执行的。
 
 ```cpp
 #ifndef __YUFC_RUNNER__
@@ -443,49 +447,49 @@ namespace ns_runner
         Runner() {}
         ~Runner() {}
     public:
-        // Just specify the file name, no need to include the path
+        // 指名文件名即可，不需要带上路径，不需要带上路径
         static int Run(const std::string& file_name)
         {
-
+            
         }
     };
 }
 #endif
 ```
 
-First, we definitely need to `fork()`.
+首先肯定是要`fork()`的。
 
-**Some important points:**
+**一些要注意的点：**
 
-> After the program finishes running:
+> 程序运行完成之后：
 >
-> 1. Code runs to completion, result is correct
+> 1. 代码跑完，结果正确
 >
-> 2. Code runs to completion, result is incorrect
+> 2. 代码跑完，结果不正确
 >
-> 3. Code doesn't finish running, exception occurs
+> 3. 代码没跑完，异常
 >
-> Does Run need to consider whether the result is correct or not? No!
+> run需要考虑代码跑完，结果正确与否吗？不需要！
 >
-> Whether the result is correct is determined by the test cases!
+> 判断结果对不对，是由测试用例决定的！
 >
-> So this part only considers whether the code ran to completion correctly.
+> 所以这部分只考虑代码是否正确运行完毕
 >
-> Also, we need to know who the executable is.
+> 另外，我们必须知道，可执行程序是谁？
 >
-> When a program starts by default:
+> 一个程序在默认启动的时候：
 >
-> - Standard input: not handled, self-test scenario not considered
+> - 标准输入：不处理，不考虑自测的情况
 >
-> - Standard output: the output result after the program finishes running
+> - 标准输出：程序运行完成，输出结果是什么
 >
-> - Standard error: runtime error information (different from compilation errors)
+> - 标准错误：运行时错误信息（区别编译错误信息）
 >
-> We want all three outputs to be redirectable to files.
+> 我们希望，这三个输出，都可以重定向到文件中去
 
-So we need to distinguish between compile-time errors and runtime errors.
+所以，我们要区分编译时的错误和运行时的错误。
 
-So let's rename the Stderr in Util from earlier.
+所以刚才Util里面的Stderr重新改一下。
 
 ```cpp
 static std::string CompilerError(const std::string &file_name)
@@ -496,42 +500,42 @@ static std::string CompilerError(const std::string &file_name)
 
 ![](./figs/7.png)
 
-Here we need to print runtime information, so we need log files for stdin, stdout, and stderr with the same name.
+这里面我们需要打印运行时的信息，所以需要stdin, stdout, stderr的三个同名文件的日志文件。
 
-So we can add more to PathUtil.
+所以PathUtil里面可以再加东西。
 
 ![](./figs/8.png)
 
 ![](./figs/9.png)
 
-Open these files:
+打开这几个文件
 
 ```cpp
-// Open these files
+// 打开这几个文件
 umask(0);
 int _stdin_fd = open(_stdin_file_name.c_str(), O_CREAT | O_RDONLY, 0777);
 int _stdout_fd = open(_stdout_file_name.c_str(), O_CREAT | O_WRONLY, 0777);
 int _stderr_fd = open(_stderr_file_name.c_str(), O_CREAT | O_WRONLY, 0777);
 ```
 
-Of course, we need to ensure the files are opened successfully.
+当然要保证文件打开成功。
 
 ```cpp
-// Must ensure files are opened successfully
-if (_stdin_fd < 0 || _stdout_fd < 0 || _stderr_fd < 0)
+// 一定要保证打开成功
+if (_stdin_fd < 0 || _stdout_fd < 0 || _stderr_fd < 0) 
 {
-    // LOG() <<
-    return -1; // Represents file open failure
+    // LOG() << 
+    return -1; // 代表打开文件失败
 }
 ```
 
-The parent process doesn't care about these file descriptors; it just waits.
+父进程是不关心的这些文件描述符的，然后父进程就是等就行了。
 
 ```cpp
-else
+else 
 {
-    // Parent process
-    // Parent process doesn't care about these file descriptors
+    // 父进程
+    // 父进程不关注这些文件描述符
     close(_stdin_fd);
     close(_stdout_fd);
     close(_stderr_fd);
@@ -540,67 +544,66 @@ else
 }
 ```
 
-Child process:
+子进程。
 
 ```cpp
 else if (pid == 0)
 {
-    // Child process
-    // Perform three redirections
+    // 子进程
+    // 进行三个重定向
     dup2(_stdin_fd, 0);
-    dup2(_stdout_fd, 1);
-    dup2(_stderr_fd, 2);
+    dup2(_stdout_fd, 1);   
+    dup2(_stderr_fd, 2);   
 
     execlp(_execute_file_name.c_str(), _execute_file_name.c_str(), nullptr);
-    exit(1); // If an error occurs, it will reach here, set to 1
+    exit(1); // 如果出错了就会到这里来，设置成1
 }
 ```
 
-But now there's a question: how do we know if the system encountered an exception?
+但是现在有问题，我们如何知道系统是否遇到了异常呢？
 
-If a program crashes, it must have received a signal.
+程序出崩溃，肯定是收到了信号。
 
 ```cpp
-else
+else 
 {
-    // Parent process
-    // Parent process doesn't care about these file descriptors
+    // 父进程
+    // 父进程不关注这些文件描述符
     close(_stdin_fd);
     close(_stdout_fd);
     close(_stderr_fd);
     int status = 0;
     waitpid(pid, &status, 0);
-    // If the program runs abnormally, it must be because it received a signal
-    return status & 0x7F; // The final return here is the signal received by the child process
+    // 程序运行异常，一定是因为收到了信号
+    return status & 0x7F; // 这里最后返回的是获取到子进程的信号
 }
 ```
 
 ```cpp
 /*
     return value: status & 0x7F
-    >0 means the program encountered an exception, the child process received a signal
-    The return value is the corresponding signal number!
-    ==0 means normal execution completed, results are saved in temporary files,
-    whether it passed the test cases is not our concern
-    <0 means internal error (e.g., file open failure, child process creation failure)
+    >0 表示程序发生了异常，子进程收到了信号
+    返回值就是对应的信号编号！
+    ==0 正常运行完毕，结果保存到了临时文件当中，是否跑过测试用例，不关心
+    <0 内部错误（比如打开文件失败，创建子进程失败）
 */
 ```
 
-Add the logging.
+把日志补上。
 
-## 7. Testing the Run Module
+## 7. 测试运行模块
 
 ![](./figs/10.png)
 
-## 8. Introduction to Resource Limits
+## 8. 初识资源限制
 
-Let's learn a new Linux interface.
+认识一个新的linux接口。
 
 ![](./figs/11.png)
 
-Create a `test.cc` in the `comm` directory to learn this interface.
+现在`comm`里面创建一个`test.cc`来学习这个接口。
 
-### 8.1 Limiting Time
+### 8.1 限制时间
 
 ```cpp
 #include <iostream>
@@ -608,7 +611,7 @@ Create a `test.cc` in the `comm` directory to learn this interface.
 #include <sys/resource.h>
 int main()
 {
-    // Limit runtime
+    // 限制运行时长
     struct rlimit r;
     r.rlim_cur = 1;
     r.rlim_max = RLIM_INFINITY;
@@ -623,12 +626,12 @@ int main()
 
 ![](./figs/12.png)
 
-### 8.2 Limiting Memory Size
+### 8.2 限制内存大小
 
 ```cpp
 int main()
 {
-    // Limit memory size
+    // 限制内存大小
     struct rlimit r;
     r.rlim_cur = 1024*1024*40; // 20M
     r.rlim_max = RLIM_INFINITY;
@@ -636,7 +639,7 @@ int main()
     int count = 0;
     while (true)
     {
-        int *p = new int[1024*1024]; // Allocate 1MB at a time
+        int *p = new int[1024*1024]; // 一次申请1mb
         std::cout << "size: " << count++ << std::endl;
         sleep(1);
     }
@@ -646,11 +649,11 @@ int main()
 
 ![](./figs/13.png)
 
-### 8.3 How is the Process Terminated?
+### 8.3 进程时如何被终止的？
 
-Insufficient resources cause the OS to terminate the process via signals.
+资源不足，导致OS终止进程，是通过信号终止的。
 
-Now I'm curious — what signals do these two pieces of code receive respectively?
+那我现在有点好奇，我这两份代码，分别会收到什么信号。
 
 ```cpp
 
@@ -668,12 +671,12 @@ void handler(int signo)
 
 int main()
 {
-    // Catch signals
+    // 捕捉信号
     for (int i = 1; i <= 31; i++)
     {
         signal(i, handler);
     }
-    // Limit runtime
+    // 限制运行时长
 #if false
     struct rlimit r;
     r.rlim_cur = 1;
@@ -685,7 +688,7 @@ int main()
     }
 #endif
 
-    // Limit memory size
+    // 限制内存大小
     struct rlimit r;
     r.rlim_cur = 1024 * 1024 * 40; // 20M
     r.rlim_max = RLIM_INFINITY;
@@ -693,7 +696,7 @@ int main()
     int count = 0;
     while (true)
     {
-        int *p = new int[1024 * 1024]; // Allocate 1MB at a time
+        int *p = new int[1024 * 1024]; // 一次申请1mb
         std::cout << "size: " << count++ << std::endl;
         sleep(1);
     }
@@ -701,25 +704,25 @@ int main()
 }
 ```
 
-We can see that the memory issue actually receives signal 6.
+我们看到，内存问题其实就是收到了6号信号。
 
 ![](./figs/13.png)
 
 ![](./figs/14.png)
 
-What about the time limit?
+时间限制呢？
 
 ![](./figs/15.png)
 
-### 8.4 Setting Resource Limits for Runner
+### 8.4 给runner设置资源限制
 
-Set the limits here:
+在这里设置限制
 
 ![](./figs/16.png)
 
-Of course, our `Run` method should ideally expose the limits we need.
+当然我们的`Run`方法，最好就是对外暴露，我们需要的限制。
 
-So let's modify it:
+所以改一下
 
 ```cpp
 static int Run(const std::string &file_name, int cpu_limit, int mem_limit) {}
@@ -728,8 +731,8 @@ static int Run(const std::string &file_name, int cpu_limit, int mem_limit) {}
 ```cpp
 static void SetProcLimit(int cpu_limit, int mem_limit)
 {
-    /* Provide an interface for setting process resource limits */
-    /* mem_limit is in KB */
+    /* 提供设置进程占用资源大小的接口 */
+    /* mem_limit 是 kb 单位 */
     struct rlimit cpu_rlimit;
     cpu_rlimit.rlim_max = RLIM_INFINITY;
     cpu_rlimit.rlim_cur = cpu_limit;
@@ -737,38 +740,38 @@ static void SetProcLimit(int cpu_limit, int mem_limit)
 
     struct rlimit mem_rlimit;
     mem_rlimit.rlim_max = RLIM_INFINITY;
-    mem_rlimit.rlim_cur = mem_limit * 1024; // Convert to KB
+    mem_rlimit.rlim_cur = mem_limit * 1024; // 转化成kb
     setrlimit(RLIMIT_AS, &mem_rlimit);
 }
 ```
 
-## 9. compile_run Module Implementation
+## 9. complie_run模块编写
 
-### 9.1 Basic Framework Understanding
+### 9.1 基本框架理解
 
-This module, besides combining compile and run, most importantly adapts to user requests.
+这一模块除了结合compile和run之外，最重要的，是去适配用户请求。
 
-Note that this module is called by network services. A large number of users may work on the same problem simultaneously, so we need to generate unique file names.
+而且要注意，这个模块是网络服务调用的，大量用户有可能会同时做同一个题目，所以此时我们要形成唯一的文件名。
 
-Also, `compile_server.cc` should not see the `compile` module or the `run` module — it should only see the `compile_run` module. That's the correct approach.
+另外`compile_server.cc`这个文件是不应该看到`compile`模块和`run`模块的，他只能看到`compile_run`模块，这样才是对的。
 
 ![](./figs/17.png)
 
-### 9.2 Installing and Understanding jsoncpp
+### 9.2 安装和认识jsoncpp
 
 ```bash
 sudo yum install jsoncpp-devel -y
 ```
 
-Simple usage:
+简单使用。
 
 ```cpp
 #include <jsoncpp/json/json.h>
 #include <string>
 int main()
 {
-    // Serialization
-    // Value is a JSON intermediate class that can hold key-value pairs
+    // 序列化工作
+    // Value 是一个Json的中间类，可以填充kv值
     Json::Value root;
     root["code"] = "mycode";
     root["user"] = "whb";
@@ -781,7 +784,7 @@ int main()
 }
 ```
 
-You need to link a library when compiling:
+要链接一个库来编译。
 
 ```bash
 g++ test.cc -std=c++11 -ljsoncpp
@@ -789,58 +792,58 @@ g++ test.cc -std=c++11 -ljsoncpp
 
 ![](./figs/18.png)
 
-### 9.3 CR Module - Part 1
+### 9.3 cr模块-1
 
-Now let's write the Start function.
+现在开始写start。
 
 ```cpp
 /*
-    Input parameters:
-        input: the input corresponding to the user's submitted code
-        code: the user's submitted code, processed as-is
-        cpu_limit: time requirement
-        mem_limit: memory requirement
-    Output parameters:
-        status: status code
-        reason: request result
-        stdout: the output result of my program
-        stderr: the error output after running
+    输入参数:
+        input: 用户给自己提交的代码对应的输入
+        code: 用户提交的代码对应的输入，不做处理
+        cpu_limit: 时间要求
+        mem_limit: 空间要求
+    输出参数:
+        status: 状态码
+        reason: 请求结果
+        stdout: 我的程序运行完的结果
+        stderr: 运行完的错误结果
 */
 static void Start(const std::string &in_json, const std::string *out_json)
 {
     Json::Value in_value;
     Json::Reader reader;
-    reader.parse(in_json, in_value); // Handle errors later
-    // Code and input
+    reader.parse(in_json, in_value); // 最后再处理差错问题
+    // 代码和输入
     std::string code = in_value["code"].asString();
-    std::string input = in_value["input"].asString(); // Not processed
-    // Time limit and memory limit
+    std::string input = in_value["input"].asString(); // 不做处理
+    // 时间限制和空间限制
     int cpu_limit = in_value["cpu_limit"].asInt();
     int mem_limit = in_value["mem_limit"].asInt();
 
 
     if (code.size() == 0)
     {
-        // User didn't submit code
+        // 用户没有提交代码
         // ...
     }
-    // Generate a unique filename, then write the code to a temporary file
+    // 形成一个唯一文件名，然后把code写到临时文件里面去
     std::string file_name = FileUtil::UniqFileName();
-    FileUtil::WriteFile(PathUtil::Src(file_name), code); // Create temporary source file
+    FileUtil::WriteFile(PathUtil::Src(file_name), code); // 形成临时src源文件
     //
     Compiler::Compile(file_name);
     Runner::Run(file_name, cpu_limit, mem_limit);
 }
 ```
 
-This is roughly the skeleton. But there's still a lot to add, such as:
+大概的骨架就是这样。但是这里还有很多要补充的，比如。
 
-- Error handling at each step
-- out hasn't been built yet
+- 每一步出现问题，要做差错处理
+- out还没开始构建
 
-### 9.4 CR Module - Part 2
+### 9.4 cr模块-2
 
-The input and output JSON roughly looks like this:
+输入和输出的json大概是这样的。
 
 ```cpp
 /*
@@ -851,64 +854,64 @@ The input and output JSON roughly looks like this:
 */
 ```
 
-Now we need to add some error handling.
+现在我们要去补一些差错处理。
 
-We use `goto` statements.
+我们利用`goto`语句。
 
 ```cpp
 static void Start(const std::string &in_json, const std::string *out_json)
 {
     Json::Value in_value;
     Json::Reader reader;
-    reader.parse(in_json, in_value); // Handle errors later
-    // Code and input
+    reader.parse(in_json, in_value); // 最后再处理差错问题
+    // 代码和输入
     std::string code = in_value["code"].asString();
-    std::string input = in_value["input"].asString(); // Not processed
-    // Time limit and memory limit
+    std::string input = in_value["input"].asString(); // 不做处理
+    // 时间限制和空间限制
     int cpu_limit = in_value["cpu_limit"].asInt();
     int mem_limit = in_value["mem_limit"].asInt();
 
-    // Variables cannot be defined in the goto jump range
-    // Status code to return to the upper layer
+    // 因为goto跳转的区间不能定义变量
+    // 返回给上层的状态码
     int status_code = 0;
-    // Status code returned by Run
+    // Run返回的状态码
     int runner_rt_code = 0;
-    // Unique filename
+    // 唯一的文件名
     std::string file_name;
 
-    // Build the final JSON to return to the user
+    // 构建一个最终给用户返回的json
     Json::Value out_value;
 
     if (code.size() == 0)
     {
-        status_code = -1; // File is empty
+        status_code = -1; // 文件为空
         goto END;
     }
-    // Generate a unique filename, then write the code to a temporary file
-    // We'll use millisecond-level timestamp + atomic incremental unique value to ensure uniqueness
+    // 形成一个唯一文件名，然后把code写到临时文件里面去
+    // 这里到时候采用毫秒级时间戳+原子性递增唯一值：来保证唯一性
     file_name  = FileUtil::UniqFileName();
-    if (!FileUtil::WriteFile(PathUtil::Src(file_name), code)) // Create temporary source file
+    if (!FileUtil::WriteFile(PathUtil::Src(file_name), code)) // 形成临时src源文件
     {
-        status_code = -2; // Unknown error
+        status_code = -2; // 未知错误
         goto END;
     }
     if (!Compiler::Compile(file_name))
     {
-        status_code = -3; // Compilation error
+        status_code = -3; // 编译错误
         goto END;
     }
     runner_rt_code = Runner::Run(file_name, cpu_limit, mem_limit);
     if (runner_rt_code < 0)
     {
-        status_code = -2; // Unknown error
+        status_code = -2; // 未知错误
         goto END;
     }
     else if(runner_rt_code > 0)
     {
-        status_code = runner_rt_code; // Program crashed during execution
+        status_code = runner_rt_code; // 程序运行崩溃
         goto END;
     }
-    else
+    else 
     {
         status_code = 0;
     }
@@ -917,66 +920,66 @@ static void Start(const std::string &in_json, const std::string *out_json)
     out_value['reason'] = ;
     if(status_code == 0)
     {
-        // The entire process was successful
+        // 整个过程全部成功
         out_value["stdout"] = ;
         out_value["stderr"] = ;
     }
 }
 ```
 
-The general framework is like this:
+大概框架是这样的。
 
 ```cpp
 static void Start(const std::string &in_json, std::string *out_json)
 {
     Json::Value in_value;
     Json::Reader reader;
-    reader.parse(in_json, in_value); // Handle errors later
-    // Code and input
+    reader.parse(in_json, in_value); // 最后再处理差错问题
+    // 代码和输入
     std::string code = in_value["code"].asString();
-    std::string input = in_value["input"].asString(); // Not processed
-    // Time limit and memory limit
+    std::string input = in_value["input"].asString(); // 不做处理
+    // 时间限制和空间限制
     int cpu_limit = in_value["cpu_limit"].asInt();
     int mem_limit = in_value["mem_limit"].asInt();
 
-    // Variables cannot be defined in the goto jump range
-    // Status code to return to the upper layer
+    // 因为goto跳转的区间不能定义变量
+    // 返回给上层的状态码
     int status_code = 0;
-    // Status code returned by Run
+    // Run返回的状态码
     int runner_rt_code = 0;
-    // Unique filename
+    // 唯一的文件名
     std::string file_name;
 
-    // Build the final JSON to return to the user
+    // 构建一个最终给用户返回的json
     Json::Value out_value;
 
     if (code.size() == 0)
     {
-        status_code = -1; // File is empty
+        status_code = -1; // 文件为空
         goto END;
     }
-    // Generate a unique filename, then write the code to a temporary file
-    // We'll use millisecond-level timestamp + atomic incremental unique value to ensure uniqueness
+    // 形成一个唯一文件名，然后把code写到临时文件里面去
+    // 这里到时候采用毫秒级时间戳+原子性递增唯一值：来保证唯一性
     file_name = FileUtil::UniqFileName();
-    if (!FileUtil::WriteFile(PathUtil::Src(file_name), code)) // Create temporary source file
+    if (!FileUtil::WriteFile(PathUtil::Src(file_name), code)) // 形成临时src源文件
     {
-        status_code = -2; // Unknown error
+        status_code = -2; // 未知错误
         goto END;
     }
     if (!Compiler::Compile(file_name))
     {
-        status_code = -3; // Compilation error
+        status_code = -3; // 编译错误
         goto END;
     }
     runner_rt_code = Runner::Run(file_name, cpu_limit, mem_limit);
     if (runner_rt_code < 0)
     {
-        status_code = -2; // Unknown error
+        status_code = -2; // 未知错误
         goto END;
     }
     else if (runner_rt_code > 0)
     {
-        status_code = runner_rt_code; // Program crashed during execution
+        status_code = runner_rt_code; // 程序运行崩溃
         goto END;
     }
     else
@@ -988,7 +991,7 @@ END:
     out_value['reason'] = CodeToDesc(status_code);
     if (status_code == 0)
     {
-        // The entire process was successful
+        // 整个过程全部成功
         out_value["stdout"] = FileUtil::ReadFile(PathUtil::Stdout(file_name));
         out_value["stderr"] = FileUtil::ReadFile(PathUtil::Stderr(file_name));
     }
@@ -997,66 +1000,66 @@ END:
 }
 ```
 
-### 9.5 CR Module - Part 3
+### 9.5 cr模块-3
 
-Complete the various utilities needed.
+完成刚刚需要的各个工具。
 
 #### 9.5.1 `CodeToDesc()`
 
 ```cpp
 static std::string CodeToDesc(int code)
 {
-    // Status code -> corresponding description
+    // 状态码 -> 对应的描述
     std::string desc;
     switch (code)
     {
     case 0:
-        desc = "Compilation and execution succeeded";
+        desc = "编译运行成功";
         break;
     case -1:
-        desc = "User submitted empty code";
+        desc = "用户提交的代码是空";
         break;
     case -2:
-        desc = "Unknown error";
+        desc = "未知错误";
         break;
     case -3:
-        desc = "Compilation error occurred";
+        desc = "编译时发生了错误";
         break;
     case SIGABRT:
-        desc = "Memory limit exceeded";
+        desc = "内存超过范围";
         break;
     case SIGXCPU:
-        desc = "CPU time limit exceeded";
+        desc = "cpu使用超时";
         break;
     case SIGFPE:
-        desc = "Floating point overflow";
+        desc = "浮点数溢出";
         break;
     default:
-        desc = "Unknown error (code: " + std::to_string(code) + ")";
+        desc = "未知错误(code: " + std::to_string(code) + ")";
         break;
     }
     return desc;
 }
 ```
 
-If we encounter other cases later, we can just add them here.
+后续遇到了什么其他的，可以直接在里面加就行了。
 
 #### 9.5.2 `UniqFileName()`
 
 ```cpp
 static std::string UniqFileName()
 {
-    // Define an atomic counter from the C++11 library #include <atomic>
-    static std::atomic_uint id(0); // static here to avoid redefining id on each call
+    // 定义一个C++11库 #include <atomic> 里面提供的一个原子性的计数器
+    static std::atomic_uint id(0); // 这里要static，避免每次调用它都重新定义这个id
     id++;
-    // Millisecond-level timestamp + atomic incremental unique value to ensure uniqueness
-    std::string ms = TimeUtil::GetTimeMs(); // Get millisecond-level timestamp
+    // 毫秒级时间戳+原子性递增唯一值：来保证唯一性
+    std::string ms = TimeUtil::GetTimeMs(); // 得到毫秒级时间戳
     std::string uniq_id = std::to_string(id);
     return ms + "." + uniq_id;
 }
 ```
 
-#### 9.5.3 `WriteFile()` and `ReadFile()`
+#### 9.5.3 `WriteFile()`和`ReadFile()`
 
 ```cpp
 static bool WriteFile(const std::string &target, const std::string &content)
@@ -1073,7 +1076,7 @@ static bool WriteFile(const std::string &target, const std::string &content)
 static bool ReadFile(const std::string &target, std::string *content, bool keep = false)
 {
     /*
-        keep == false means don't preserve the "\n" in each line
+        keep == false 表示不保留每一行的 "\n" 
     */
     (*content).clear();
     std::ifstream in(target);
@@ -1082,8 +1085,8 @@ static bool ReadFile(const std::string &target, std::string *content, bool keep 
         return false;
     }
     std::string line;
-    // getline doesn't preserve line separators -- there's a pitfall here
-    // getline sometimes needs to preserve \n
+    // getline不保存行分隔符 -- 这里有坑
+    // getline 有些时候是需要保留\n的
     while (std::getline(in, line))
     {
         (*content) += line;
@@ -1094,17 +1097,17 @@ static bool ReadFile(const std::string &target, std::string *content, bool keep 
 }
 ```
 
-Then since we changed `ReadFile()` to output results via parameters, the file reading in the CR module also needs to be updated.
+然后我们`ReadFile()`改成这种结果从参数输出出去的形式之后，cr里面的读文件也要改一下了。
 
 ![](./figs/19.png)
 
-### 9.6 Testing the Code
+### 9.6 对代码进行测试
 
-First, compile directly with `make clean;make` to check for compilation issues.
+先直接`make clean;make` 编译一下，看看有没有编译问题先。
 
-Then we need to set up a testing method.
+然后我们要来开始弄一个测试的方法了。
 
-In `compile_server.cc`:
+在`compile_server.cc`里面。
 
 ```cpp
 #include "compile_run.hpp"
@@ -1117,10 +1120,10 @@ int main()
     in_value["input"] = "";
     in_value["cpu_limit"] = 1;
     in_value["mem_limit"] = 10240 * 3;
-
+    
     Json::FastWriter writer;
     in_json = writer.write(in_value);
-    std::cout << in_json << std::endl; // Let's see what the result looks like first
+    std::cout << in_json << std::endl; // 先看看结果是啥样的先
     // compile_run::Start();
     return 0;
 }
@@ -1128,26 +1131,26 @@ int main()
 
 ![](./figs/20.png)
 
-Let me introduce a C++11 tool: raw strings.
+介绍一下C++11的一个工具，原生字符串。
 
 `R"()"` raw string
 
-Because our code will definitely contain many special characters.
+因为我们code里面肯定有很多特殊字符。
 
-Writing it this way is correct; the above version still has some minor issues. Then we can run successfully.
+这样写才是对的，上面这个还是有一些小问题。然后我们就运行成功了。
 
 ![](./figs/21.png)
 
-We can reproduce and test various errors by modifying the temporary code inside.
+我们可以通过改这个里面临时的代码，去复现和测试各种错误。
 
-### 9.7 Cleanup Work
+### 9.7 收尾工作
 
-The temporary files we generate still need to be cleaned up.
+我们产生的临时文件还是需要清理一下的。
 
 ```cpp
 static void RemoveTempFile(const std::string &file_name)
 {
-    // The number of files to clean is uncertain, but we know which ones there are
+    // 清理文件的个数是不确定，但是有哪些我们是知道的？
     std::string src_file_name = PathUtil::Src(file_name);
     if (FileUtil::IsFileExists(src_file_name))
         unlink(src_file_name.c_str());
@@ -1173,15 +1176,15 @@ static void RemoveTempFile(const std::string &file_name)
 }
 ```
 
-Actually, I feel like we could use program replacement with an rm script, which might also work.
+其实感觉可以用程序替换，替换一个rm的脚本，感觉也可以。
 
-### 9.8 Building the Network Service
+### 9.8 形成网络服务
 
-#### 9.8.1 cpp-httplib Third-party Network Library
+#### 9.8.1 cpp-httplib第三方网络库
 
-This library is very easy to use. It's header-only — you just need to copy the .h file over, very simple.
+这个库用起来很简单，他这个库是header-only的，只需要把.h拷贝过来就行了，很简单。
 
-Note that using this library requires upgrading gcc/g++ to version 7, 8, 9, or higher, otherwise it won't work.
+注意，用这个库需要把gcc/g++升级到 7,8,9 这些高版本上，不然用不了。
 
 ```bash
 yufc@ALiCentos7:~/Src/Bit-Project/online_judge/comm$ gcc --version
@@ -1189,18 +1192,18 @@ gcc (GCC) 8.3.1 20190311 (Red Hat 8.3.1-3)
 Copyright (C) 2018 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-yufc@ALiCentos7:~/Src/Bit-Project/online_judge/comm$
+yufc@ALiCentos7:~/Src/Bit-Project/online_judge/comm$ 
 ```
 
-Simple usage:
+简单使用。
 
 ![](./figs/22.png)
 
 ![](./figs/23.png)
 
-First, let's solve the Chinese character encoding issue.
+先解决一下中文乱码问题。
 
-This will work:
+这样就行了。
 
 ```cpp
 svr.Get("/hello", [](const Request &req, Response &resp) {
@@ -1208,12 +1211,12 @@ svr.Get("/hello", [](const Request &req, Response &resp) {
 });
 ```
 
-#### 9.8.2 Building the Post Method
+#### 9.8.2 建立Post方法
 
 ```cpp
 svr.Post("/compile_and_run", [](const Request &req, Response &resp)
          {
-    // The body of the user's request is the JSON string we want
+    // 用户请求的正文，就是我们想要的json string
     std::string in_json = req.body;
     std::string out_json;
     if (!in_json.empty())
@@ -1223,19 +1226,19 @@ svr.Post("/compile_and_run", [](const Request &req, Response &resp)
     } });
 ```
 
-This is easy to understand, nothing much to say. The user's incoming request is essentially the JSON string that the CR module needs.
+这个很好理解，没啥好说的。因为用户过来的请求其实就是cr模块想要的json串。
 
-#### 9.8.3 Comprehensive Testing with Postman
+#### 9.8.3 使用postman进行综合测试
 
-We can use Postman for testing. Just download it.
+可以采用postman进行测试，百度下载一下。
 
 ![](./figs/24.png)
 
-Done.
+搞定了。
 
 ![](./figs/25.png)
 
-But there's still an issue. Since the compile_run module will eventually be accessed by oj_server, we don't want to hardcode the port number. So we want to use command-line arguments to invoke this CR module.
+但是现在还有一个问题，以为到时候访问compile_run模块的是oj_server模块，因此我们不想把端口号写死，所以我们希望用命令行参数调用这个cr模块。
 
 ```cpp
 #include "compile_run.hpp"
@@ -1262,7 +1265,7 @@ int main(int argc, char *argv[])
 #endif
     svr.Post("/compile_and_run", [](const Request &req, Response &resp)
              {
-        // The body of the user's request is the JSON string we want
+        // 用户请求的正文，就是我们想要的json string
         std::string in_json = req.body;
         std::string out_json;
         if (!in_json.empty())
@@ -1271,35 +1274,35 @@ int main(int argc, char *argv[])
             resp.set_content(out_json, "application/json;charset=utf-8");
         } });
 
-    svr.listen("0.0.0.0", atoi(argv[1])); // Start the HTTP service
+    svr.listen("0.0.0.0", atoi(argv[1])); // 启动http服务
 
     return 0;
 }
 ```
 
-At this point, the compilation module is done!
+至此，编译模块搞定！
 
-## 10. oj_server Preparation
+## 10. oj_server准备工作
 
-### 10.1 oj_server Preparation
+### 10.1 oj_server准备工作
 
-**Essence: Writing a website**
+**本质：写一个网站**
 
-1. Get the homepage — here we'll use the problem list as the homepage
+1. 获取首页，这里我们用用题目列表充当首页
 
-2. Editor page
+2. 编辑区域页面
 
-3. Submit and judge functionality
+3. 提交判题功能
 
-**MVC Architecture**
+**MVC结构**
 
-M: Model — usually the module that interacts with data, e.g., CRUD operations on the problem bank (file-based / MySQL-based)
+M：Model，通常是和数据交互的模块，比如，对题库进行增删查改（文件版/Mysql版）
 
-V: View — usually takes data and constructs web pages, renders page content, and displays it to the user (browser)
+V：View，通常是拿到数据之后，要进行构建网页，渲染网页内容，展示给用户的（浏览器）
 
-C: Control — the controller, which is our core business logic
+C：Control，控制器，就是我们的核心业务逻辑
 
-### 10.2 Prepare the File Directory
+### 10.2 把文件目录准备好
 
 ```bash
 yufc@ALiCentos7:~/Src/Bit-Project/online_judge/oj_server$ ls
@@ -1318,7 +1321,7 @@ yufc@ALiCentos7:~/Src/Bit-Project/online_judge/oj_server$ tree .
 yufc@ALiCentos7:~/Src/Bit-Project/online_judge/oj_server$
 ```
 
-### 10.3 Write the Network Routing First
+### 10.3 先把网络路由功能写好
 
 ```cpp
 #include <iostream>
@@ -1327,23 +1330,23 @@ using namespace httplib;
 
 int main()
 {
-    // User request routing functionality
+    // 用户请求的路由功能
     Server svr;
-    // Get the list of all problems
+    // 获取所有题目的列表
     svr.Get("/all_questions", [](const Request &req, Response &resp) {
-        resp.set_content("This is the list of all problems", "text/plain; charset=utf-8");
+        resp.set_content("这是所有题目的列表", "text/plain; charset=utf-8");
     });
-    // User wants to get the content of a specific problem by number
-    // /question/100  ->  regex matching
+    // 用户要根据题目编号获取题目的内容
+    // /question/100  ->  正则匹配
     svr.Get(R"(/question/(\d+))", [](const Request &req, Response &resp){
-        std::string number = req.matches[1]; // Here we get what the regex captured
-        // Feel free to explore this further
-        resp.set_content("This is a specific problem: " + number, "text/plain; charset=utf-8");
+        std::string number = req.matches[1]; // 这里可以得到正则表达式获取到的东西
+        // 感兴趣可以研究一下
+        resp.set_content("这是指定的一道题: " + number, "text/plain; charset=utf-8");
     });
-    // User submission
+    // 用户提交
     svr.Get(R"(/judge/(\d+))", [](const Request &req, Response &resp){
         std::string number = req.matches[1];
-        resp.set_content("This is the judge for the specific problem: " + number, "text/plain; charset=utf-8");
+        resp.set_content("这是指定题目的判题: " + number, "text/plain; charset=utf-8");
     });
 
     svr.listen("0.0.0.0", 8080);
@@ -1351,23 +1354,23 @@ int main()
 }
 ```
 
-The specific responses can be filled in later.
+具体的响应我们导师后可以再去补充。
 
-### 10.4 Designing the Problem Bank (File-based)
+### 10.4 设计题库（文件版）
 
-> 1. Problem number
-> 2. Problem title
-> 3. Problem difficulty
-> 4. Problem description
-> 5. Time requirement (internal processing)
-> 6. Memory requirement (internal processing)
+> 1. 题目的编号
+> 2. 题目的标题
+> 3. 题目的难度
+> 4. 题目的描述，题面
+> 5. 时间要求（内部处理）
+> 6. 空间要求（内部处理）
 
-Composed of two sets of files:
+两批文件构成
 
-1. question.list: problem list (no problem content needed)
-2. Problem description, preset code (header.cpp), test case code (tail.cpp)
+1. question.list : 题目列表（不需要题目的内容）
+2. 题目的描述，题目的预设置代码（header.cpp），测试用例代码（tail.cpp）
 
-These two are linked through the problem number.
+这两个内容是通过题目的编号产生关联的。
 
 ```bash
 yufc@ALiCentos7:~/Src/Bit-Project/online_judge/oj_server/questions$ tree .
@@ -1379,7 +1382,7 @@ yufc@ALiCentos7:~/Src/Bit-Project/online_judge/oj_server/questions$ tree .
 └── question.list
 
 1 directory, 4 files
-yufc@ALiCentos7:~/Src/Bit-Project/online_judge/oj_server/questions$
+yufc@ALiCentos7:~/Src/Bit-Project/online_judge/oj_server/questions$ 
 ```
 
 **`question.list`**
@@ -1393,24 +1396,24 @@ yufc@ALiCentos7:~/Src/Bit-Project/online_judge/oj_server/questions$
 **`./1/desc.txt`**
 
 ```
-Determine whether an integer is a palindrome. A palindrome is an integer that reads the same backward as forward.
+判断一个整数是否是回文数。回文数是指正序（从左向右）和倒序（从右向左）读都是一样的整数。
 
-Example 1:
-Input: 121
-Output: true
+示例1:
+输入: 121
+输出: true
 
-Example 2:
-Input: -121
-Output: false
-Explanation: Reading from left to right, it is -121. Reading from right to left, it becomes 121-. Therefore it is not a palindrome.
+示例2:
+输入: -121
+输出: false
+解释: 从左向右读，为-121。从右向左读，为121-。因此它不是一个回文数。
 
-Example 3:
-Input: 10
-Output: false
-Explanation: Reading from right to left, it becomes 01. Therefore it is not a palindrome.
+示例3:
+输入: 10
+输出: false
+解释: 从左向右读，为01。因此不是一个回文数
 
-Advanced:
-Can you solve this problem without converting the integer to a string?
+进阶:
+你能不将整数转为字符串来解决这个问题吗?
 ```
 
 **`./1/header.cpp`**
@@ -1435,40 +1438,40 @@ public:
 };
 ```
 
-This is what's shown to the user.
+展示给用户的。
 
 **`./1/tail.cpp`**
 
 ```cpp
 
 #ifndef COMPILER_ONLINE
-#include "header.cpp" // For IDE hints during development
+#include "header.cpp" // 为了让我们写的时候有提示
 #endif
 
 void Test1()
 {
-    // Call the method by creating a temporary object
+    // 通过定义临时对象，来完成方法的调用
     bool ret = Solution().isPalindrome(121);
     if (ret)
     {
-        std::cout << "Passed test case 1, testing 121 passed ... OK!" << std::endl;
+        std::cout << "通过用例1, 测试121通过 ... OK!" << std::endl;
     }
     else
     {
-        std::cout << "Failed test case 1, tested value is: 121" << std::endl;
+        std::cout << "没有通过用例1, 测试的值是: 121" << std::endl;
     }
 }
 void Test2()
 {
-    // Call the method by creating a temporary object
+    // 通过定义临时对象，来完成方法的调用
     bool ret = Solution().isPalindrome(-10);
     if (!ret)
     {
-        std::cout << "Passed test case 2, testing -10 passed ... OK!" << std::endl;
+        std::cout << "通过用例2, 测试-10通过 ... OK!" << std::endl;
     }
     else
     {
-        std::cout << "Failed test case 2, tested value is: -10" << std::endl;
+        std::cout << "没有通过用例2, 测试的值是: -10" << std::endl;
     }
 }
 int main()
@@ -1479,21 +1482,21 @@ int main()
 }
 ```
 
-The following code section is intended to be trimmed later, because it's only there to prevent red squiggly lines in the IDE during development:
+下面这段代码我们是希望后面裁剪掉的，因为这一段代码仅仅只是为了我们开发的时候不要有这么多红色波浪号而已。
 
 ```cpp
 #ifndef COMPILER_ONLINE
-#include "header.cpp" // For IDE hints during development
+#include "header.cpp" // 为了让我们写的时候有提示
 #endif
 ```
 
-When compiling, just add the macro with `g++ -D COMPILER_ONLINE`.
+编译的时候`g++ -D COMPILER_ONLINE`带上这个宏即可。
 
-## 11. Building the Model Code
+## 11. 构建model部分代码
 
-### 11.1 Setting Up the Model Framework
+### 11.1 搭建model的框架
 
-First, build the framework.
+先搭建出框架。
 
 ```cpp
 #ifndef __YUFC_OJ_MODEL_HPP__
@@ -1506,8 +1509,8 @@ First, build the framework.
 #include <vector>
 #include "../comm/log.hpp"
 
-// Load all problem information from the question.list file into memory
-// model: mainly used to interact with data and provide data access interfaces
+// 根据 question.list 文件，加载所有的题目信息到内存中
+// model: 主要用来和数据进行交互，对外提供访问数据的接口
 
 namespace ns_model
 {
@@ -1515,14 +1518,14 @@ namespace ns_model
     struct Question
     {
     public:
-        std::string __number; // Problem number (unique)
-        std::string __title;  // Problem title
-        std::string __star;   // Problem difficulty // Easy/Medium/Hard
-        int __cpu_limit;      // Problem time limit
-        int __mem_limit;      // Problem memory limit
-        std::string __desc;   // Problem description
-        std::string __header; // Preset code
-        std::string __tail;   // Test cases, need to be concatenated with header to form complete code
+        std::string __number; // 题目编号（唯一的）
+        std::string __title;  // 题目的标题
+        std::string __star;   // 题目的难度 // 简单/中等/困难
+        int __cpu_limit;      // 题目时间要求
+        int __mem_limit;      // 题目的空间要求
+        std::string __desc;   // 题目的描述
+        std::string __header; // 预设的代码
+        std::string __tail;   // 题目的测试用例，需要和header拼接，形成完整的代码
     };
 
     const std::string question_list_root = "./questions/question.list";
@@ -1543,7 +1546,7 @@ namespace ns_model
         bool LoadQuestionList(const std::string &question_list)
         {
             /*
-                Load config file: questions/question.list + problem number files
+                加载配置文件: questions/question.list + 题目编号文件
             */
         }
         void GetAllQuestions(std::vector<Question> *out)
@@ -1552,15 +1555,15 @@ namespace ns_model
         void GetOneQuestions(const std::string &number, Question *q)
         {
         }
-
+        
     };
 };
 #endif
 ```
 
-### 11.2 Writing the Model Code
+### 11.2 编写model代码
 
-`GetAllQuestions` and `GetOneQuestions` are simple — just write them directly.
+`GetAllQuestions`和`GetOneQuestions`很简单，直接写。
 
 ```cpp
 bool GetAllQuestions(std::vector<Question> *out)
@@ -1571,7 +1574,7 @@ bool GetAllQuestions(std::vector<Question> *out)
     }
     for (const auto &q : __questions)
     {
-        out->push_back(q.second); // Move from hash map to vector
+        out->push_back(q.second); // 把哈希的丢到vector里面去
     }
     return true;
 }
@@ -1587,7 +1590,7 @@ bool GetOneQuestions(const std::string &number, Question *q)
 }
 ```
 
-String splitting utility:
+切分字符串的工具。
 
 ```cpp
 class StringUtil
@@ -1595,17 +1598,17 @@ class StringUtil
 public:
     static void SplitString(const std::string &str, std::vector<std::string>* target, std::string sep)
     {
-        /*
-            str: the string to split
-            target: output result
-            sep: specified delimiter
+        /*  
+            str: 要切分的字符串
+            target: 输出结果
+            sep: 指定的分割符
         */
 
     }
 };
 ```
 
-Complete Model module code:
+model模块整体代码。
 
 ```cpp
 
@@ -1623,8 +1626,8 @@ Complete Model module code:
 #include "../comm/log.hpp"
 #include "../comm/util.hpp"
 
-// Load all problem information from the question.list file into memory
-// model: mainly used to interact with data and provide data access interfaces
+// 根据 question.list 文件，加载所有的题目信息到内存中
+// model: 主要用来和数据进行交互，对外提供访问数据的接口
 
 namespace ns_model
 {
@@ -1634,14 +1637,14 @@ namespace ns_model
     struct Question
     {
     public:
-        std::string __number; // Problem number (unique)
-        std::string __title;  // Problem title
-        std::string __star;   // Problem difficulty // Easy/Medium/Hard
-        int __cpu_limit;      // Problem time limit
-        int __mem_limit;      // Problem memory limit
-        std::string __desc;   // Problem description
-        std::string __header; // Preset code
-        std::string __tail;   // Test cases, need to be concatenated with header to form complete code
+        std::string __number; // 题目编号（唯一的）
+        std::string __title;  // 题目的标题
+        std::string __star;   // 题目的难度 // 简单/中等/困难
+        int __cpu_limit;      // 题目时间要求
+        int __mem_limit;      // 题目的空间要求
+        std::string __desc;   // 题目的描述
+        std::string __header; // 预设的代码
+        std::string __tail;   // 题目的测试用例，需要和header拼接，形成完整的代码
     };
 
     const std::string question_list_root = "./questions/question.list";
@@ -1662,27 +1665,27 @@ namespace ns_model
         bool LoadQuestionList(const std::string &question_list)
         {
             /*
-                Load config file: questions/question.list + problem number files
+                加载配置文件: questions/question.list + 题目编号文件
             */
 
             std::ifstream in(question_list);
             if (!in.is_open())
             {
-                LOG(FATAL) << "Failed to load problem bank, please check if the problem bank file exists"
+                LOG(FATAL) << "加载题库失败，请检查是否存在题库文件"
                            << "\n";
                 return false;
             }
-            // Read line by line
+            // 按行读取
             std::string line;
             while (std::getline(in, line))
             {
-                // Use space as delimiter
-                // Split the string
+                // 以空格为分割符
+                // 切分字符串
                 std::vector<std::string> tokens;
                 StringUtil::SplitString(line, &tokens, " ");
-                if (tokens.size() != 5) // Means splitting has issues
+                if (tokens.size() != 5) // 说明切分有问题
                 {
-                    LOG(WARNING) << "Failed to load some problems, please check the file format"
+                    LOG(WARNING) << "加载部分题目失败，请检查文件格式"
                                  << "\n";
                     continue;
                 }
@@ -1701,9 +1704,9 @@ namespace ns_model
                 FileUtil::ReadFile(question_number_path + "header.cpp", &(q.__header), true);
                 FileUtil::ReadFile(question_number_path + "tail.cpp", &(q.__tail), true);
 
-                __questions.insert({q.__number, q}); // Insert into hash map
+                __questions.insert({q.__number, q}); // 插入到哈希表中
             }
-            LOG(INFO) << "Loading problem bank ... Success!"
+            LOG(INFO) << "记载题库 ... 成功！"
                       << "\n";
             in.close();
         }
@@ -1711,13 +1714,13 @@ namespace ns_model
         {
             if (__questions.size() == 0)
             {
-                LOG(ERROR) << "User failed to get problem bank"
+                LOG(ERROR) << "用户获取题库失败"
                            << "\n";
                 return false;
             }
             for (const auto &q : __questions)
             {
-                out->push_back(q.second); // Move from hash map to vector
+                out->push_back(q.second); // 把哈希的丢到vector里面去
             }
             return true;
         }
@@ -1726,7 +1729,7 @@ namespace ns_model
             const auto &iter = __questions.find(number);
             if (iter == __questions.end())
             {
-                LOG(ERROR) << "User failed to get problem, problem number: " << number << "\n";
+                LOG(ERROR) << "用户获取题目失败，题目编号: " << number << "\n";
                 return false;
             }
             (*q) = iter->second;
@@ -1738,9 +1741,9 @@ namespace ns_model
 #endif
 ```
 
-### 11.3 Installing the Boost Library
+### 11.3 安装boost库
 
-We have a string splitting method that hasn't been written yet. We plan to use the Boost library for it.
+我们有一个字符串切割的方法还没写，我们打算用boost库来写。
 
 ```bash
 sudo yum install -y boost-devel
@@ -1748,26 +1751,26 @@ sudo yum install -y boost-devel
 
 ![](./figs/26.png)
 
-### 11.4 Using Boost Library to Complete the String Splitting Method
+### 11.4 使用boost库来完成字符串切割方法
 
 ```cpp
 static void SplitString(const std::string &str, std::vector<std::string> *target, const std::string &sep)
 {
     /*
-        str: the string to split
-        target: output result
-        sep: specified delimiter
+        str: 要切分的字符串
+        target: 输出结果
+        sep: 指定的分割符
     */
-    // Boost library
+    // boost 库
     boost::split((*target), str, boost::is_any_of(sep), boost::algorithm::token_compress_on);
 }
 ```
 
-Done in one line.
+一句话搞定。
 
-## 12. Writing the Control Module's Basic Structure
+## 12. 编写control模块的基础结构
 
-First, write the basic structure.
+先把基础结构写了。
 
 ```cpp
 #ifndef __YUFC_OJ_CONTROL_HPP__
@@ -1788,27 +1791,27 @@ namespace ns_control
     private:
         Model __model;
     public:
-
+        
     };
 } // namespace ns_control
 #endif
 ```
 
-Then how does the cc file call it?
+然后我们cc文件是如何调用的呢？
 
-Like this:
+是这样调用的。
 
 ```cpp
 int main()
 {
-    // User request routing functionality
+    // 用户请求的路由功能
     Server svr;
     Control ctrl;
 
-    // Get the list of all problems
+    // 获取所有题目的列表
     svr.Get("/all_questions", [&ctrl](const Request &req, Response &resp)
             {
-        // Here I want to return an HTML page containing all the problem list information
+        // 这里我想返回一张包含所以题目列表信息的html网页
         std::string html;
         ctrl.AllQuestions(&html);
 
@@ -1818,7 +1821,7 @@ int main()
 }
 ```
 
-Then the Control structure becomes like this:
+然后control的结构就变成这样了。
 
 ```cpp
 
@@ -1846,13 +1849,13 @@ namespace ns_control
         Model __model;
 
     public:
-        // Build web page based on problem data, html is an output parameter
+        // 根据题目数据构建网页 html是输出型参数
         bool AllQuestions(std::string *html)
         {
             std::vector<Question> all;
             if (this->__model.GetAllQuestions(&all))
             {
-                // Successfully got problem info, build all problems into a web page
+                // 获取题目信息成功，将所有题目数据构建成网页
             }
             else
             {
@@ -1863,7 +1866,7 @@ namespace ns_control
             Question q;
             if (__model.GetOneQuestions(number, &q))
             {
-                // Successfully got the specified problem
+                // 获取指定题目成功
             }
             else
             {
@@ -1875,9 +1878,9 @@ namespace ns_control
 #endif
 ```
 
-## 13. Introduction to ctemplate Frontend Rendering Library
+## 13. 认识ctemplate前端渲染库
 
-### 13.1 Installing ctemplate
+### 13.1 安装ctemplate
 
 ```url
 https://github.com/OlafvdSpek/ctemplate
@@ -1885,42 +1888,42 @@ https://github.com/OlafvdSpek/ctemplate
 
 ![](./figs/27.png)
 
-I installed it in this location on my machine:
+我自己的机子我装在这个地方。
 
 ![](./figs/28.png)
 
-Enter this directory.
+进入这个文件夹。
 
-Run this command:
+运行这个命令。
 
 ```bash
 ./autogen.sh
 ```
 
-Then run this command:
+然后运行这个命令。
 
 ```bash
 ./configure
 ```
 
-Then run this command:
+然后运行这个命令。
 
 ```bash
 make
 ```
 
-Then run this command:
+然后运行这个命令。
 
 ```bash
 sudo make install
 ```
 
-### 13.2 Basic Usage
+### 13.2 基本使用
 
-Two things are needed:
+需要两个东西
 
-1. A data dictionary to store data
-2. The web page content to be rendered
+1. 保存数据的数据字典
+2. 待被渲染的网页内容
 
 **`test.cc`**
 
@@ -1939,14 +1942,14 @@ int main()
     std::string in_html = "./test.html";
     std::string value = "bitejiuyeke";
 
-    // Create data dictionary
-    ctemplate::TemplateDictionary root("test"); // Similar to unordered_map
+    // 形成数据字典
+    ctemplate::TemplateDictionary root("test"); // 类似unordered_map
     root.SetValue("key", value);                // test.insert({})
 
-    // Get the web page object to be rendered
+    // 获取被渲染网页对象
     ctemplate::Template *tpl = ctemplate::Template::GetTemplate(in_html, ctemplate::DO_NOT_STRIP);
 
-    // Add dictionary data to the web page
+    // 添加字典数据到网页中
     std::string out_html;
     tpl->Expand(&out_html, &root);
     std::cout << out_html << std::endl;
@@ -1962,7 +1965,7 @@ int main()
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>For Testing</title>
+    <title>用来测试</title>
 </head>
 <body>
     <p>{{key}}</p>
@@ -1973,25 +1976,25 @@ int main()
 </html>
 ```
 
-All instances of key will be replaced.
+所以的key就会被替换。
 
-You might encounter an issue when running the executable:
+此时运行可执行可能会遇到问题。
 
 ```bash
 ./test: error while loading shared libraries: libctemplate.so.3: cannot open shared object file: No such file or directory
 ```
 
-Just add the environment variable:
+此时添加环境变量即可。
 
 ```bash
 export LD\_LIBRARY\_PATH=$LD\_LIBRARY\_PATH:/usr/local/lib
 ```
 
-You can also add it to `~/.bash_profile`.
+也可以丢到`~/.bash_profile`里面去也是可以的。
 
-### 13.3 Writing the View Module
+### 13.3 编写view模块
 
-First, let's supplement the Control module calls.
+先补充一下control模块的调用。
 
 ```cpp
 class Control
@@ -2000,19 +2003,19 @@ private:
     Model __model;
     View __view;
 public:
-    // Build web page based on problem data, html is an output parameter
+    // 根据题目数据构建网页 html是输出型参数
     bool AllQuestions(std::string *html)
     {
         bool ret = true;
         std::vector<struct Question> all;
         if (this->__model.GetAllQuestions(&all))
         {
-            // Successfully got problem info, build all problems into a web page
+            // 获取题目信息成功，将所有题目数据构建成网页
             __view.AllExpandHtml(all, html);
         }
         else
         {
-            *html = "Failed to get page, failed to get problem list";
+            *html = "获取网页失败，获取题目列表失败";
             ret = false;
         }
         return ret;
@@ -2023,12 +2026,12 @@ public:
         struct Question q;
         if (__model.GetOneQuestions(number, &q))
         {
-            // Successfully got the specified problem
+            // 获取指定题目成功
             __view.OneExpandHtml(q, html);
         }
         else
         {
-            *html = "Specified problem, number: " + number + " does not exist";
+            *html = "指定题目, 编号: " + number + " 不存在";
             ret = false;
         }
         return ret;
@@ -2036,7 +2039,7 @@ public:
 };
 ```
 
-**Now we need to write the View module's `AllExpandHtml` and `OneExpandHtml` methods.**
+**然后我们就要去写`View`模块的`AllExpandHtml`和`OneExpandHtml`模块。**
 
 ```cpp
 
@@ -2057,14 +2060,14 @@ namespace ns_view
         struct Question
         {
         public:
-            std::string __number; // Problem number (unique)
-            std::string __title;  // Problem title
-            std::string __star;   // Problem difficulty // Easy/Medium/Hard
-            int __cpu_limit;      // Problem time limit
-            int __mem_limit;      // Problem memory limit
-            std::string __desc;   // Problem description
-            std::string __header; // Preset code
-            std::string __tail;   // Test cases, need to be concatenated with header to form complete code
+            std::string __number; // 题目编号（唯一的）
+            std::string __title;  // 题目的标题
+            std::string __star;   // 题目的难度 // 简单/中等/困难
+            int __cpu_limit;      // 题目时间要求
+            int __mem_limit;      // 题目的空间要求
+            std::string __desc;   // 题目的描述
+            std::string __header; // 预设的代码
+            std::string __tail;   // 题目的测试用例，需要和header拼接，形成完整的代码
         };
     */
 
@@ -2087,20 +2090,20 @@ namespace ns_view
 #endif
 ```
 
-### 13.4 Preparing Some Frontend Files
+### 13.4 准备一些前端文件
 
 ![](./figs/29.png)
 
 ![](./figs/30.png)
 
-### 13.5 Getting the Problem List
+### 13.5 获取题目列表
 
 ```cpp
 void AllExpandHtml(const std::vector<struct Question> questions, std::string *html)
 {
-    // 1. Form the path
+    // 1. 形成路径
     std::string src_html = template_path + "all_questions.html";
-    // 2. Create data dictionary
+    // 2. 形成数据字典
     ctemplate::TemplateDictionary root("all_questions");
     for (const auto &q : questions)
     {
@@ -2109,17 +2112,17 @@ void AllExpandHtml(const std::vector<struct Question> questions, std::string *ht
         sub->SetValue("title", q.__title);
         sub->SetValue("star", q.__star);
     }
-    // 3. Get the HTML to be rendered
+    // 3. 获取被渲染的html
     ctemplate::Template *tpl = ctemplate::Template::GetTemplate(src_html, ctemplate::DO_NOT_STRIP);
 
-    // 4. Execute rendering
+    // 4. 执行渲染
     tpl->Expand(html, &root);
 }
 ```
 
 ![](./figs/31.png)
 
-### 13.6 Getting a Single Problem
+### 13.6 获取单个题目
 
 ```cpp
 void OneExpandHtml(const struct Question &q, std::string *html)
@@ -2152,41 +2155,41 @@ void OneExpandHtml(const struct Question &q, std::string *html)
 </html>
 ```
 
-## 14. Writing the Load Balancing Module
+## 14. 编写负载均衡模块整体代码
 
-### 14.1 Preparation
+### 14.1 准备工作
 
 ```cpp
 void Judge(const std::string in_json, std::string *out_json)
 {
     /*
-        in_json contains:
+        in_json包含这些东西:
         # 1. id
         # 2. code: #include ...
         # 3. input: ""
     */
-    // 1. Deserialize in_json
-    // 2. Re-concatenate user code + test case code to form new code
-    // 3. Select the host with the lowest load, then make an HTTP request and get the result
-    // 4. Assign the result to out_json
+    // 1. 反序列化 in_json
+    // 2. 重新拼接用户代码+测试用例代码，形成新的代码
+    // 3. 选择负载最低的主机，然后发起http请求，得到结果
+    // 4. 将结果赋值给out_json
 }
 ```
 
-This is what we need to do.
+我们要做的就是这些事情。
 
-We plan to put our host information in this configuration file.
+我们打算在这个配置文件里面，放我们主机的信息。
 
 ![](./figs/32.png)
 
-### 14.2 Writing the Load Balancing Module Structure
+### 14.2 编写负载均衡模块整体结构
 
 ```cpp
-/* class Machine represents a service-providing host */
+/* class Machine 是提供服务的主机 */
 class Machine
 {
 
 };
-/* Load balancing module */
+/* 负载均衡模块 */
 class LoadBalance
 {
 
@@ -2194,27 +2197,27 @@ class LoadBalance
 ```
 
 ```cpp
-/* class Machine represents a service-providing host */
+/* class Machine 是提供服务的主机 */
 class Machine
 {
 public:
-    std::string __ip;  // Compilation service IP
-    int __port;        // Compilation service port
-    uint64_t __load;   // Current compilation service load
-    std::mutex *__mtx; // C++ mutex prohibits copying, so define as pointer
+    std::string __ip;  // 编译服务的ip
+    int __port;        // 编译服务的port
+    uint64_t __load;   // 当前编译服务的负载大小
+    std::mutex *__mtx; // C++的mutex是禁止拷贝的，所以要定义成指针
 public:
     Machine() : __ip(""), __port(0), __load(0), __mtx(nullptr) {}
     ~Machine() {}
 };
-/* Load balancing module */
+/* 负载均衡模块 */
 const std::string service_machine_path = "./conf/service_machine.conf";
 class LoadBalance
 {
 private:
-    // Each host has its own index, we use the index as the host's ID
-    std::vector<Machine> __machines; // All hosts
-    std::vector<int> __online;       // Online host IDs
-    std::vector<int> __offline;      // Offline host IDs
+    // 每一台主机都有自己的下标，我们用下标充当主机的id
+    std::vector<Machine> __machines; // 所有的主机
+    std::vector<int> __online;       // 在线主机的id
+    std::vector<int> __offline;      // 离线主机id
 public:
     LoadBalance()
     {
@@ -2226,7 +2229,7 @@ public:
     bool LoadConf(const std::string &machine_list)
     {
     }
-    // Intelligent selection
+    // 智能选择
     bool int_select()
     {
     }
@@ -2239,9 +2242,9 @@ public:
 };
 ```
 
-### 14.3 Completing the Load Balancing Module Code
+### 14.3 完善负载均衡模块代码
 
-#### 14.3.1 Loading the Configuration File
+#### 14.3.1 加载配置文件
 
 ```cpp
 bool LoadConf(const std::string &machine_conf)
@@ -2249,7 +2252,7 @@ bool LoadConf(const std::string &machine_conf)
     std::ifstream in(machine_conf);
     if (!in.is_open())
     {
-        LOG(FATAL) << "Loading: " << machine_conf << " failed"
+        LOG(FATAL) << "加载: " << machine_conf << "失败"
                    << "\n";
         return false;
     }
@@ -2260,7 +2263,7 @@ bool LoadConf(const std::string &machine_conf)
         StringUtil::SplitString(line, &tokens, ":");
         if (tokens.size() != 2)
         {
-            LOG(WARNING) << "Splitting " << line << " failed"
+            LOG(WARNING) << "切分" << line << " 失败"
                          << "\n";
             continue;
         }
@@ -2269,50 +2272,50 @@ bool LoadConf(const std::string &machine_conf)
         m.__port = atoi(tokens[1].c_str());
         m.__load = 0;
         m.__mtx = new std::mutex();
-        __online.push_back(__machines.size()); // All hosts are started
-        __machines.push_back(m); // Add to the host list
+        __online.push_back(__machines.size()); // 主机都是启动的
+        __machines.push_back(m); // 放到主机列表中去
     }
     in.close();
     return true;
 }
 ```
 
-#### 14.3.2 Intelligent Host Selection
+#### 14.3.2 智能选择主机
 
-To ensure safety when selecting hosts, we also need to add a mutex to the `LoadBalance` class.
+为了保证选择主机的时候是安全的，我们还需要给`LoadBalance`类添加一个互斥锁。
 
 ```cpp
 bool IntelligentSelect(int *id, Machine **m)
 {
-    // 1. Use the selected host (update the host's load)
-    // 2. We may take this host offline
+    // 1. 使用选择好的主机(更新主机的负载)
+    // 2. 我们可能离线该主机
     /*
-        id: output parameter
-        m: the selected host
+        id: 输出参数
+        m: 选择好的主机
     */
     __mtx.lock();
-    // Load balancing algorithm
-    // 1. Random number method
-    // 2. Round-robin + hash
+    // 负载均衡的算法
+    // 1. 随机数法
+    // 2. 轮询+hash
     int online_num = __online.size();
     if (online_num == 0)
     {
         __mtx.unlock();
-        LOG(FATAL) << "All backend compilation hosts are offline, operations team please check immediately"
+        LOG(FATAL) << "所有后端编译主机已经全部离线，请运维同时尽快查看"
                    << "\n";
         return false;
     }
-    // Initialize return values
+    // 初始化要返回的东西
     *id = __online[0];
     *m = &__machines[__online[0]];
     uint64_t min_load = __machines[__online[0]].GetLoad();
     for (int i = 0; i < online_num; i++)
     {
-        // Find the machine with the lowest load by traversal
+        // 通过遍历的方式，找到所有负载最小的机器
         uint64_t temp_load = __machines[__online[i]].GetLoad();
         if (min_load > temp_load)
         {
-            min_load = temp_load; // Update load information
+            min_load = temp_load; // 更新负载信息
             *id = __online[i];
             *m = &__machines[__online[i]];
         }
@@ -2322,23 +2325,23 @@ bool IntelligentSelect(int *id, Machine **m)
 }
 ```
 
-Writing to this point, we realize that hosts need their own way to update their load.
+写到这里就会发现，我们主机自己要有更新负载的方式。
 
 ```cpp
-/* class Machine represents a service-providing host */
+/* class Machine 是提供服务的主机 */
 class Machine
 {
 public:
-    std::string __ip;  // Compilation service IP
-    int __port;        // Compilation service port
-    uint64_t __load;   // Current compilation service load
-    std::mutex *__mtx; // C++ mutex prohibits copying, so define as pointer
+    std::string __ip;  // 编译服务的ip
+    int __port;        // 编译服务的port
+    uint64_t __load;   // 当前编译服务的负载大小
+    std::mutex *__mtx; // C++的mutex是禁止拷贝的，所以要定义成指针
 public:
     Machine() : __ip(""), __port(0), __load(0), __mtx(nullptr) {}
     ~Machine() {}
 
 public:
-    // Increase load
+    // +负载
     void IncLoad()
     {
         if (__mtx)
@@ -2347,7 +2350,7 @@ public:
         if (__mtx)
             __mtx->unlock();
     }
-    // Decrease load
+    // -负载
     void DecLoad()
     {
         if (__mtx)
@@ -2356,7 +2359,7 @@ public:
         if (__mtx)
             __mtx->unlock();
     }
-    // Get host load
+    // 获取主机负载
     uint64_t GetLoad()
     {
         uint64_t cur_load = 0;
@@ -2370,94 +2373,94 @@ public:
 };
 ```
 
-### 14.4 Judge Implementation - Part 1
+### 14.4 Judge编写1
 
 ```cpp
 void Judge(const std::string &number, const std::string in_json, std::string *out_json)
 {
     /*
-        in_json contains:
+        in_json包含这些东西:
         # 1. code: #include ...
         # 2. input: ""
     */
-    // 0. Get the corresponding problem details based on the problem number
+    // 0. 根据题目编号，直接拿到对应的题目细节
     struct Question q;
     __model.GetOneQuestions(number, &q);
-    // 1. Deserialize in_json
+    // 1. 反序列化 in_json
     Json::Value in_value;
     Json::Reader reader;
     reader.parse(in_json, in_value);
     std::string code = in_value["code"].asString();
-    // 2. Re-concatenate user code + test case code to form new code
-    Json::Value compile_value; // This will be sent to the CR service
+    // 2. 重新拼接用户代码+测试用例代码，形成新的代码
+    Json::Value compile_value; // 将来要将它发到cr上的
     compile_value["input"] = in_value["input"].asString();
-    compile_value["code"] = code + q.__tail; // Concatenate the code!
+    compile_value["code"] = code + q.__tail; // 拼接代码！
     compile_value["cpu_limit"] = q.__cpu_limit;
     compile_value["mem_limit"] = q.__mem_limit;
     Json::FastWriter writer;
-    std::string compile_str = writer.write(compile_value); // compile_str is ready to send to CR
-    // 3. Select the host with the lowest load, then make an HTTP request and get the result
-    // Rule: keep selecting until a host is available, otherwise all are down
+    std::string compile_str = writer.write(compile_value); // compile_str就是准备发送给cr的
+    // 3. 选择负载最低的主机，然后发起http请求，得到结果
+    // 规则: 一直选择，直到主机可用，否则，就是全部挂掉
     while (true)
     {
         int id = 0;
         Machine *m = nullptr;
         if (!__load_balance.IntelligentSelect(&id, &m))
         {
-            break; // IntelligentSelect already has logging
+            break; // IntelligentSelect 里面有日志了
         }
-        LOG(INFO) << "Host selected successfully, host id: " << id << " details: "
+        LOG(INFO) << "选择主机成功, 主机id: " << id << "详情: "
                   << m->__ip << ":" << m->__port << "\n";
-        // Make the request
+        // 发起请求
         httplib::Client cli(m->__ip, m->__port);
-        m->IncLoad(); // Increase this host's load
+        m->IncLoad(); // 增加这台主机的负载
         if (auto res = cli.Post("/compile_and_run", compile_str, "application/json;charset=utf-8"))
         {
-            // res is actually a Result type
+            // res 其实就是 Result 类型
             *out_json = res->body;
-            m->DecLoad(); // Request completed, decrease load
+            m->DecLoad(); // 请求完毕，减少负载
             break;
         }
         else
         {
-            // Request failed
-            LOG(INFO) << "Current request host id: " << id << " details: "
-                      << m->__ip << ":" << m->__port << " may be offline" << "\n";
-            m->DecLoad(); // Not necessary
-            __load_balance.OfflineMachine(id); // Take this machine offline
+            // 请求失败
+            LOG(INFO) << "当前请求的主机id: " << id << "详情: "
+                      << m->__ip << ":" << m->__port << " 可能已经离线" << "\n";
+            m->DecLoad(); // 没必要
+            __load_balance.OfflineMachine(id); // 离线这台机器
         }
     }
 }
 ```
 
-The overall logic isn't particularly difficult — it's all fairly easy to understand. Pay attention to the httplib client usage.
+整体思路没有比较难的地方，都比较好理解。然后要注意httplib客户端的使用。
 
-Of course there are still issues. We know that only when the status code is 200 does the request count as successful — getting a response doesn't mean success.
+当然现在肯定是还有问题的，我们知道，只有状态码是200的时候，才算请求成功，并不是拿到请求了就算成功了。
 
-So it's better to add a check:
+所以判断一下比较好。
 
 ```cpp
-// Make the request
+// 发起请求
 httplib::Client cli(m->__ip, m->__port);
-m->IncLoad(); // Increase this host's load
+m->IncLoad(); // 增加这台主机的负载
 if (auto res = cli.Post("/compile_and_run", compile_str, "application/json;charset=utf-8"))
 {
-    // res is actually a Result type
+    // res 其实就是 Result 类型
     if (res->status == 200)
     {
         *out_json = res->body;
-        m->DecLoad(); // Request completed, decrease load
+        m->DecLoad(); // 请求完毕，减少负载
         break;
     }
     m->DecLoad();
 }
 else
 {
-    // Request failed
-    LOG(INFO) << "Current request host id: " << id << " details: "
-              << m->__ip << ":" << m->__port << " may be offline"
-              << "\n";                         // Not necessary
-    __load_balance.OfflineMachine(id); // Take this machine offline (this will also reset the load to 0)
+    // 请求失败
+    LOG(INFO) << "当前请求的主机id: " << id << "详情: "
+              << m->__ip << ":" << m->__port << " 可能已经离线"
+              << "\n";                 // 没必要
+    __load_balance.OfflineMachine(id); // 离线这台机器(这里面也会将负载清0的)
 }
 ```
 
@@ -2471,10 +2474,10 @@ void OfflineMachine(int which)
     {
         if(*iter == which)
         {
-            // Found the host to take offline
+            // 要离线的主机已经找到了
             __online.erase(iter);
             __offline.push_back(*iter);
-            break; // Because of break, we temporarily don't need to worry about iterator invalidation
+            break; // 因为break，所以我们暂时不考虑迭代器失效的问题
         }
     }
     __mtx.unlock();
@@ -2483,19 +2486,19 @@ void OfflineMachine(int which)
 
 ### 14.6 OnlineMachine
 
-When all hosts are offline, we bring them all back online together.
+当所有主机都离线的时候，我们统一上线。
 
-We'll write this later, because right now we don't even know what the running state looks like.
+我们后面统一写，因为现在我们连运行起来什么样子都不知道，所以我们后面再写。
 
-### 14.7 Postman Testing
+### 14.7 Postman测试
 
 ![](./figs/35.png)
 
-This issue appears because of a leftover problem we haven't solved yet.
+出现这个问题就是因为我们之前的遗留问题还没有解决。
 
 ![](./figs/36.png)
 
-This needs to be removed! So when we call g++, we need to include the macro!
+这个是要去掉的！所以我们调用g++的时候，要带上宏！
 
 ```cpp
 execlp("g++", "g++", "-o", PathUtil::Exe(file_name).c_str(), PathUtil::Src(file_name).c_str(), "-std=c++11", "-D", "COMPILER_ONLINE", nullptr);
@@ -2503,34 +2506,34 @@ execlp("g++", "g++", "-o", PathUtil::Exe(file_name).c_str(), PathUtil::Src(file_
 
 ![](./figs/37.png)
 
-After the fix, everything works fine.
+改了之后就没问题了。
 
-## 15. Frontend Development
+## 15. 前端部分编写
 
-### 15.1 Prerequisite Knowledge
+### 15.1 准备知识
 
-Now we need to write the frontend. We first need to be able to write a passable frontend to submit code for testing, otherwise we can't debug.
+现在要写前端了，我们要先能写一个合格的前端，把代码提交上来试试才行，不然我们没法调试。
 
-- A basic version of the homepage
-- List of all problems
-- The coding page for a specified problem + code submission
+- 丐版的首页
+- 所有题目的列表
+- 指定题目的编写代码的页面+代码提交
 
-Does a backend developer need to care about frontend pages? Not at all. So why are we writing it? If you don't want to write it, just copy and paste.
+后端开发需要关心前端页面？根本不需要，为什么我们要写它？如果不想写直接复制粘贴即可。
 
-1. Any project needs both frontend and backend
-2. Although the backend doesn't care about pages, it needs to understand how frontend and backend interact
-3. For written exams and interviews, backend doesn't need frontend knowledge, but it's good to have some understanding of the frontend
+1. 任何项目，都要有前后端
+2. 后端虽然不关心所谓的页面，但是需要了解一下前后端是如何交互的
+3. 笔试面试，后端用不着前端，前端部分了解一下即可
 
-When writing pages, you need the three pillars: HTML + CSS + JS
+编写页面的时候需要三剑客：html+css+js
 
-### 15.2 Getting Started
+### 15.2 开始操作
 
-Adjusting styles essentially means adjusting the styles of HTML tags:
+所谓的对样式进行调整，本质是对html中的标签的样式做调整
 
-1. Select the tag
-2. Set the style
+1. 选中标签
+2. 设置样式
 
-### 15.3 Homepage
+### 15.3 首页
 
 ```html
 <!DOCTYPE html>
@@ -2539,13 +2542,13 @@ Adjusting styles essentially means adjusting the styles of HTML tags:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Personal OJ System</title>
-    <!-- Page styles -->
+    <title>这个我的个人OJ系统</title>
+    <!-- 网页的样式 -->
     <style>
         * {
-            /* Remove default margin */
+            /* 消除网页默认外边距 */
             margin: 0px;
-            /* Remove default padding */
+            /* 消除网页的默认内边距 */
             padding: 0px;
         }
 
@@ -2559,26 +2562,26 @@ Adjusting styles essentially means adjusting the styles of HTML tags:
             width: 100%;
             height: 50px;
             background-color: black;
-            /* Set overflow on parent to cancel float effects */
+            /* 给父级标签设置overflow，取消后续float带来的影响 */
             overflow: hidden;
         }
 
         .container .navbar a {
             display: inline-block;
-            /* Set a tag width */
+            /* 设置a标签的宽度 */
             width: 80px;
-            /* Set font */
+            /* 设置字体 */
             color: white;
             font-size: larger;
-            /* Vertical centering */
+            /* 上下居中 */
             line-height: 50px;
-            /* Same height as navbar */
+            /* 文字和导航栏同样高度 */
             text-decoration: none;
-            /* Center text */
+            /* 设置文字居中 */
             text-align: center;
         }
 
-        /* Set mouse hover event */
+        /* 设置鼠标事件 */
         .container .navbar a:hover {
             background-color: green;
         }
@@ -2590,23 +2593,23 @@ Adjusting styles essentially means adjusting the styles of HTML tags:
         .container .content {
             width: 800px;
             /* background-color: #ccc; */
-            /* Center overall */
+            /* 整体居中 */
             margin: 0px auto;
-            /* Center text */
+            /* 设置文字居中 */
             text-align: center;
-            /* Set top margin */
+            /* 设置上外边距 */
             margin-top: 200px;
         }
 
         .container .content .font_ {
-            /* Set tag as block element, takes full width, can set height/width properties */
+            /* 设置标签为块级元素，独占一行，可以设置高度宽度等属性 */
             display: block;
-            /* Set top margin */
+            /* 设置上外边距 */
             margin-top: 20px;
-            /* Remove underline */
+            /* 去掉下划线 */
             text-decoration: none;
         }
-
+        
         /* Adjust the font size for the header */
         .container .content .font_:first-child {
             font-size: 40px; /* You can adjust the size as needed */
@@ -2619,21 +2622,21 @@ Adjusting styles essentially means adjusting the styles of HTML tags:
 
 <body>
     <div class="container">
-        <!-- Navigation bar, functionality not implemented -->
+        <!-- 导航栏 功能不实现-->
         <div class="navbar">
-            <a href="#">Home</a>
-            <a href="/all_questions">Problems</a>
-            <a href="#">Contest</a>
-            <a href="#">Discussion</a>
-            <a href="#">Jobs</a>
-            <a class="login" href="#">Login</a>
+            <a href="#">首页</a>
+            <a href="/all_questions">题库</a>
+            <a href="#">竞赛</a>
+            <a href="#">讨论</a>
+            <a href="#">求职</a>
+            <a class="login" href="#">登录</a>
         </div>
-        <!-- Page content -->
+        <!-- 网页的内容 -->
         <div class="content">
             <h1 class="font_">~~Welcome to OnlineJudge System~~</h1>
-            <p class="font_">This is my independently developed online OJ platform</p>
+            <p class="font_">这个是我独立开发的在线OJ平台</p>
             <h2 class="font_">
-                <a href="/all_questions">Click here to start coding~</a>
+                <a href="/all_questions">点击我开始编程啦～</a>
             </h2>
         </div>
     </div>
@@ -2642,7 +2645,7 @@ Adjusting styles essentially means adjusting the styles of HTML tags:
 </html>
 ```
 
-### 15.4 Problem List
+### 15.4 题目列表
 
 ```html
 <!DOCTYPE html>
@@ -2651,12 +2654,12 @@ Adjusting styles essentially means adjusting the styles of HTML tags:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online OJ - Problem List</title>
+    <title>在线OJ-题目列表</title>
     <style>
         * {
-            /* Remove default margin */
+            /* 消除网页默认外边距 */
             margin: 0px;
-            /* Remove default padding */
+            /* 消除网页的默认内边距 */
             padding: 0px;
         }
 
@@ -2670,26 +2673,26 @@ Adjusting styles essentially means adjusting the styles of HTML tags:
             width: 100%;
             height: 50px;
             background-color: black;
-            /* Set overflow on parent to cancel float effects */
+            /* 给父级标签设置overflow，取消后续float带来的影响 */
             overflow: hidden;
         }
 
         .container .navbar a {
             display: inline-block;
-            /* Set a tag width */
+            /* 设置a标签的宽度 */
             width: 80px;
-            /* Set font */
+            /* 设置字体 */
             color: white;
             font-size: larger;
-            /* Vertical centering */
+            /* 上下居中 */
             line-height: 50px;
-            /* Same height as navbar */
+            /* 文字和导航栏同样高度 */
             text-decoration: none;
-            /* Center text */
+            /* 设置文字居中 */
             text-align: center;
         }
 
-        /* Set mouse hover event */
+        /* 设置鼠标事件 */
         .container .navbar a:hover {
             background-color: green;
         }
@@ -2742,20 +2745,20 @@ Adjusting styles essentially means adjusting the styles of HTML tags:
 <body>
     <div class="container">
         <div class="navbar">
-            <a href="/">Home</a>
-            <a href="/all_questions">Problems</a>
-            <a href="#">Contest</a>
-            <a href="#">Discussion</a>
-            <a href="#">Jobs</a>
-            <a class="login" href="#">Login</a>
+            <a href="/">首页</a>
+            <a href="/all_questions">题库</a>
+            <a href="#">竞赛</a>
+            <a href="#">讨论</a>
+            <a href="#">求职</a>
+            <a class="login" href="#">登录</a>
         </div>
         <div class="question_list">
-            <h1>OnlineJudge Problem List</h1>
+            <h1>OnlineJudge题目列表</h1>
             <table>
                 <tr>
-                    <th class="item">Problem Number</th>
-                    <th class="item">Problem Title</th>
-                    <th class="item">Difficulty</th>
+                    <th class="item">题目编号</th>
+                    <th class="item">题目标题</th>
+                    <th class="item">题目难度</th>
                 </tr>
                 {{#question_list}}
                 <tr>
@@ -2768,7 +2771,7 @@ Adjusting styles essentially means adjusting the styles of HTML tags:
         </div>
         <div class="footer">
             <!-- <hr> -->
-            <h4>@Author: Yufc</h4>
+            <h4>@作者: Yufc</h4>
         </div>
     </div>
 
@@ -2777,7 +2780,7 @@ Adjusting styles essentially means adjusting the styles of HTML tags:
 </html>
 ```
 
-### 15.5 Building a Single Problem Page with Ace Online Editor (Just Copy and Paste)
+### 15.5 Ace在线编辑器构建单个题目列表（直接复制粘贴即可）
 
 ```html
 <!DOCTYPE html>
@@ -2788,19 +2791,19 @@ Adjusting styles essentially means adjusting the styles of HTML tags:
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{number}}.{{title}}</title>
-    <!-- Import ACE plugin -->
-    <!-- Official website: https://ace.c9.io/ -->
-    <!-- CDN link: https://cdnjs.com/libraries/ace -->
-    <!-- Usage guide: https://www.iteye.com/blog/ybc77107-2296261 -->
+    <!-- 引入ACE插件 -->
+    <!-- 官网链接:https://ace.c9.io/ -->
+    <!-- CDN链接:https://cdnjs.com/libraries/ace -->
+    <!-- 使用介绍:https://www.iteye.com/blog/ybc77107-2296261 -->
     <!-- https://justcode.ikeepstudying.com/2016/05/ace-editor-
 %E5%9C%A8%E7%BA%BF%E4%BB%A3%E7%A0%81%E7%BC%96%E8%BE%91%E6%9E%81%E5%85%B6%E9%AB%98%E4%BA%AE/
 -->
-    <!-- Import ACE CDN -->
+    <!-- 引入ACE CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js" type="text/javascript"
         charset="utf-8"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ext-language_tools.js" type="text/javascript"
         charset="utf-8"></script>
-    <!-- Import jQuery CDN -->
+    <!-- 引入jquery CDN -->
     <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
     <style>
         * {
@@ -2818,28 +2821,28 @@ Adjusting styles essentially means adjusting the styles of HTML tags:
             width: 100%;
             height: 50px;
             background-color: black;
-            /* Set overflow on parent to cancel float effects */
+            /* 给父级标签设置overflow，取消后续float带来的影响 */
             overflow: hidden;
         }
 
         .container .navbar a {
-            /* Set a tag as inline-block element, allows setting width */
+            /* 设置a标签是行内块元素，允许你设置宽度 */
             display: inline-block;
-            /* Set a tag width, a tag is inline by default, can't set width */
+            /* 设置a标签的宽度,a标签默认行内元素，无法设置宽度 */
             width: 80px;
-            /* Set font color */
+            /* 设置字体颜色 */
             color: white;
-            /* Set font size */
+            /* 设置字体的大小 */
             font-size: large;
-            /* Set text height same as navbar height */
+            /* 设置文字的高度和导航栏一样的高度 */
             line-height: 50px;
-            /* Remove a tag underline */
+            /* 去掉a标签的下划线 */
             text-decoration: none;
-            /* Center text in a tag */
+            /* 设置a标签中的文字居中 */
             text-align: center;
         }
 
-        /* Set mouse hover event */
+        /* 设置鼠标事件 */
         .container .navbar a:hover {
             background-color: green;
         }
@@ -2902,7 +2905,7 @@ Adjusting styles essentially means adjusting the styles of HTML tags:
             float: right;
             background-color: #0aa610;
             color: #FFF;
-            /* Add rounded corners to button */
+            /* 给按钮带上圆角 */
             border-radius: 1ch;
             border: 0px;
             margin-top: 10px;
@@ -2926,15 +2929,15 @@ Adjusting styles essentially means adjusting the styles of HTML tags:
 
 <body>
     <div class="container">
-        <!-- Navigation bar, functionality not implemented -->
+        <!-- 导航栏， 功能不实现-->
         <div class="navbar">
-            <a href="/">Home</a>
-            <a href="/all_questions">Problems</a> <a href="#">Contest</a>
-            <a href="#">Discussion</a>
-            <a href="#">Jobs</a>
-            <a class="login" href="#">Login</a>
+            <a href="/">首页</a>
+            <a href="/all_questions">题库</a> <a href="#">竞赛</a>
+            <a href="#">讨论</a>
+            <a href="#">求职</a>
+            <a class="login" href="#">登录</a>
         </div>
-        <!-- Left-right layout, problem description and preset code -->
+        <!-- 左右呈现，题目描述和预设代码 -->
         <div class="part1">
             <div class="left_desc">
                 <h3><span id="number">{{number}}</span>.{{title}}_{{star}}</h3>
@@ -2944,26 +2947,26 @@ Adjusting styles essentially means adjusting the styles of HTML tags:
                 <pre id="code" class="ace_editor"><textarea class="ace_text-input">{{pre_code}}</textarea></pre>
             </div>
         </div>
-        <!-- Submit and get result, then display -->
+        <!-- 提交并且得到结果，并显示 -->
         <div class="part2">
             <div class="result"></div>
-            <button class="btn-submit" onclick="submit()">Submit Code</button>
+            <button class="btn-submit" onclick="submit()">提交代码</button>
         </div>
     </div>
     <script>
-        // Initialize object
+        //初始化对象
         editor = ace.edit("code");
-        // Set theme and language (more themes and languages available on GitHub)
-        // Theme gallery: http://www.manongjc.com/detail/25-cfpdrwkkivkikmk.html
+        //设置风格和语言(更多风格和语言，请到github上相应目录查看)
+        // 主题大全:http://www.manongjc.com/detail/25-cfpdrwkkivkikmk.html 
         editor.setTheme("ace/theme/textmate");
         editor.session.setMode("ace/mode/c_cpp");
-        // Font size
+        // 字体大小
         editor.setFontSize(16);
-        // Set default tab size:
+        // 设置默认制表符的大小: 
         editor.getSession().setTabSize(4);
-        // Set read-only (true for read-only, used for code display)
+        // 设置只读(true时只读，用于展示代码) 
         editor.setReadOnly(false);
-        // Enable autocomplete menu
+        // 启用提示菜单 
         ace.require("ace/ext/language_tools");
         editor.setOptions({
             enableBasicAutocompletion: true,
@@ -2971,45 +2974,45 @@ Adjusting styles essentially means adjusting the styles of HTML tags:
             enableLiveAutocompletion: true
         });
         function submit() {
-            // alert("Hey!");
-            // 1. Collect relevant data from the current page: 1. problem number 2. code
+            // alert("嘿嘿!");
+            // 1. 收集当前页面的有关数据, 1. 题号 2.代码
             var code = editor.getSession().getValue();
             // console.log(code);
             var number = $(".container .part1 .left_desc h3 #number").text();
             // console.log(number);
             var judge_url = "/judge/" + number;
             // console.log(judge_url);
-            // 2. Build JSON and send an HTTP-based JSON request to the backend via ajax
+            // 2. 构建json，并通过ajax向后台发起基于http的json请求
             $.ajax({
-                method: 'Post', // Request method to backend
-                url: judge_url, // Send request to the specified URL
-                dataType: 'json', // Tell the server what format I need
-                contentType: 'application/json;charset=utf-8', // Tell the server what I'm giving
+                method: 'Post', // 向后端发起请求的方式
+                url: judge_url, // 向后端指定的url发起请求
+                dataType: 'json', // 告知server，我需要什么格式
+                contentType: 'application/json;charset=utf-8', // 告知server，我给你的是什么
                 data: JSON.stringify({
                     'code': code,
                     'input': ''
                 }),
-                success: function (data) { // Successfully got result
+                success: function (data) { //成功得到结果
                     // console.log(data);
                     show_result(data);
                 }
             });
-            // 3. Get result, parse it and display in the result div
+            // 3. 得到结果，解析并显示到 result中 
             function show_result(data) {
                 // console.log(data.status);
                 // console.log(data.reason);
-                // Get the result label tag
-                var result_div = $(".container .part2 .result"); // Clear previous result
+                // 拿到result结果标签
+                var result_div = $(".container .part2 .result"); // 清空上一次的运行结果
                 result_div.empty();
-                // First get the result status code and reason
-                var _status = data.status;
+                // 首先拿到结果的状态码和原因结果 
+                var _status = data.status; 
                 var _reason = data.reason;
                 var reason_lable = $("<p>", {
                     text: _reason
                 });
                 reason_lable.appendTo(result_div);
                 if (status == 0) {
-                    // Request was successful, no issues in compilation/execution, but whether it passed depends on test results
+                    // 请求是成功的，编译运行过程没出问题，但是结果是否通过看测试用例的结果 
                     var _stdout = data.stdout;
                     var _stderr = data.stderr;
                     var stdout_lable = $("<pre>", {
@@ -3022,7 +3025,7 @@ Adjusting styles essentially means adjusting the styles of HTML tags:
                     stderr_lable.appendTo(result_div);
                 }
                 else {
-                    // Compilation/execution error, do nothing
+                    // 编译运行出错,do nothing
                 }
             }
         }
@@ -3038,38 +3041,38 @@ Adjusting styles essentially means adjusting the styles of HTML tags:
 
 ![](./figs/40.png)
 
-## 16. Integration Testing
+## 16. 综合调试
 
-### 16.1 Solving the Problem List Ordering Issue
+### 16.1 解决题目列表乱序问题
 
 ![](./figs/41.png)
 
-### 16.2 Solving the Issue When All Hosts Go Offline and Then Come Back Online
+### 16.2 解决当所有主机离线了，然后同上线的问题
 
 ![](./figs/42.png)
 
 ![](./figs/43.png)
 
-After all hosts go down, first restart all CR modules.
+所有主机挂掉之后。先重新启动所有cr模块。
 
-On the oj_server side, press ^C to bring all hosts back online!
+在oj_server的部分，^C一下，就能重新上线所有主机！
 
-Actually, let's change it to ^/ (using signal 3 instead), the current one is not very convenient.
+还是改成^/吧，改成三号信号，这个不太好用。
 
 ![](./figs/44.png)
 
-## 17. Project Completion
+## 17. 结项
 
-### 17.1 Project Extension Ideas
+### 17.1 项目扩展思路
 
-1. Registration and login-based problem submission functionality
-2. Business expansion — integrate your own blog into it
-3. Deploy the compilation service on Docker
-4. Currently the backend CR service uses HTTP requests (just because of the request method). We could change it to remote procedure calls. Recommended: rest_rpc, to replace our httplib.
-5. Feature improvement — after getting all test cases correct for a problem, automatically proceed to the next problem
-6. All the features in the navbar can be implemented one by one
+1. 给予注册和登录的录题功能
+2. 业务扩展，把自己的博客接入进去
+3. 把编译服务部署到docker上
+4. 目前后端的cr服务，我们使用的是http方式请求（仅仅是因为请求），我们可以改成远程过程调用，推荐rest_rpc，替换我们httplib。
+5. 功能上完善，判断一道题全部正确后，自动下一道题
+6. navbar中的功能都可以一个个去实现
 
-### 17.2 Overall Makefile Structure
+### 17.2 Makefile的整体构建
 
 ```makefile
 .PHONY:all
@@ -3106,4 +3109,4 @@ clean:
 	rm -rf make_output
 ```
 
-The make_output directory contains the content to be published.
+make_output目录下就是我们要发布的内容了。
